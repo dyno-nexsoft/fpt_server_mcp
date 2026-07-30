@@ -36,6 +36,7 @@ queue directly from chat.
 | `fpt_admin_apikeys_list`      | List your API keys                                           |
 | `fpt_admin_apikeys_add`       | Create a new API key                                         |
 | `fpt_admin_apikeys_remove`    | Delete an API key                                            |
+| `fpt_admin_logs_tail`         | Read the last N lines of server.log (`admin` scope)          |
 | `fpt_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
 | `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
 
@@ -128,6 +129,6 @@ src/
     ├── gitlabTool.ts        # fpt_gitlab_review · fpt_gitlab_analyze
     ├── zentaoTool.ts        # fpt_zentao_report_*
     ├── attendanceTool.ts    # fpt_attendance_*
-    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_cron_run
+    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run
     └── actionTool.ts        # fpt_invoke_action
 ```

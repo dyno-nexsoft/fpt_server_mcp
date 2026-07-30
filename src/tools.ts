@@ -53,6 +53,7 @@ const client = new FptServerClient();
  * - `fpt_admin_apikeys_list`     — List your API keys.
  * - `fpt_admin_apikeys_add`      — Create a new API key.
  * - `fpt_admin_apikeys_remove`   — Delete an API key.
+ * - `fpt_admin_logs_tail`        — Read the last N lines of server.log.
  * - `fpt_cron_run`               — Run a scheduled job immediately.
  * - `fpt_invoke_action`          — Generic dispatch for any action by name.
  *

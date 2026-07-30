@@ -64,6 +64,28 @@ export function registerAdminTools(server: McpServer, client: FptServerClient): 
   );
 
   server.registerTool(
+    'fpt_admin_logs_tail',
+    {
+      description:
+        "Read the last N lines of server.log for debugging (admin.logs.tail). Admin-only — the log records " +
+        'every request URL and is not otherwise reachable.',
+      inputSchema: {
+        lines: z
+          .number()
+          .int()
+          .min(1)
+          .max(1000)
+          .optional()
+          .describe('Số dòng cuối muốn xem (mặc định 200, tối đa 1000)'),
+      },
+    },
+    async ({ lines }) => {
+      const result = await client.post<any>('/actions/admin.logs.tail', { lines });
+      return mcpText(JSON.stringify(result, null, 2));
+    }
+  );
+
+  server.registerTool(
     'fpt_cron_run',
     {
       description:
