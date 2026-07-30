@@ -82,16 +82,4 @@ export function registerZentaoTools(server: McpServer, client: FptServerClient):
       return mcpText(JSON.stringify(result, null, 2));
     }
   );
-
-  server.registerTool(
-    'fpt_zentao_unlink',
-    {
-      description: "Unlink the caller's Zentao account (zentao.unlink).",
-      inputSchema: {},
-    },
-    async () => {
-      const result = await client.post<any>('/actions/zentao.unlink', {});
-      return mcpText(JSON.stringify(result, null, 2));
-    }
-  );
 }

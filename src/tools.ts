@@ -46,7 +46,6 @@ const client = new FptServerClient();
  * - `fpt_zentao_report_close`    — Close a Zentao daily report task.
  * - `fpt_zentao_report_edit`     — Edit a Zentao daily report task.
  * - `fpt_zentao_report_get`      — View a Zentao daily report task.
- * - `fpt_zentao_unlink`          — Unlink the caller's Zentao account.
  * - `fpt_attendance_status`      — View today's attendance status.
  * - `fpt_attendance_checkin`     — Record today's check-in time.
  * - `fpt_attendance_subscribe`   — Subscribe to attendance reminders.
@@ -54,9 +53,6 @@ const client = new FptServerClient();
  * - `fpt_admin_apikeys_list`     — List your API keys.
  * - `fpt_admin_apikeys_add`      — Create a new API key.
  * - `fpt_admin_apikeys_remove`   — Delete an API key.
- * - `fpt_admin_owners_list`      — List Discord owners (admin only).
- * - `fpt_admin_owners_add`       — Add a Discord owner (admin only).
- * - `fpt_admin_owners_remove`    — Remove a Discord owner (admin only).
  * - `fpt_cron_run`               — Run a scheduled job immediately.
  * - `fpt_invoke_action`          — Generic dispatch for any action by name.
  *

@@ -29,7 +29,6 @@ queue directly from chat.
 | `fpt_zentao_report_close`     | Close a Zentao daily report task                             |
 | `fpt_zentao_report_edit`      | Edit a Zentao daily report task                              |
 | `fpt_zentao_report_get`       | View a Zentao daily report task                              |
-| `fpt_zentao_unlink`           | Unlink the caller's Zentao account                           |
 | `fpt_attendance_status`       | View today's attendance status                               |
 | `fpt_attendance_checkin`      | Record today's check-in time                                 |
 | `fpt_attendance_subscribe`    | Subscribe to daily attendance reminders                      |
@@ -37,9 +36,6 @@ queue directly from chat.
 | `fpt_admin_apikeys_list`      | List your API keys                                           |
 | `fpt_admin_apikeys_add`       | Create a new API key                                         |
 | `fpt_admin_apikeys_remove`    | Delete an API key                                            |
-| `fpt_admin_owners_list`       | List Discord owners (`admin` scope)                          |
-| `fpt_admin_owners_add`        | Add a Discord owner (`admin` scope)                          |
-| `fpt_admin_owners_remove`     | Remove a Discord owner (`admin` scope)                       |
 | `fpt_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
 | `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
 
@@ -130,8 +126,8 @@ src/
     ├── jobTool.ts           # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
     ├── buildTool.ts         # fpt_trigger_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
     ├── gitlabTool.ts        # fpt_gitlab_review · fpt_gitlab_analyze
-    ├── zentaoTool.ts        # fpt_zentao_report_* · fpt_zentao_unlink
+    ├── zentaoTool.ts        # fpt_zentao_report_*
     ├── attendanceTool.ts    # fpt_attendance_*
-    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_owners_* · fpt_cron_run
+    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_cron_run
     └── actionTool.ts        # fpt_invoke_action
 ```

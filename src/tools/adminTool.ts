@@ -64,46 +64,6 @@ export function registerAdminTools(server: McpServer, client: FptServerClient): 
   );
 
   server.registerTool(
-    'fpt_admin_owners_list',
-    {
-      description: 'List Discord owners (admin.owners.list). Requires admin scope.',
-      inputSchema: {},
-    },
-    async () => {
-      const result = await client.post<any>('/actions/admin.owners.list', {});
-      return mcpText(JSON.stringify(result, null, 2));
-    }
-  );
-
-  server.registerTool(
-    'fpt_admin_owners_add',
-    {
-      description: 'Add a new Discord owner (admin.owners.add). Requires admin scope.',
-      inputSchema: {
-        user_id: z.string().describe('Discord user ID'),
-      },
-    },
-    async ({ user_id }) => {
-      const result = await client.post<any>('/actions/admin.owners.add', { user_id });
-      return mcpText(JSON.stringify(result, null, 2));
-    }
-  );
-
-  server.registerTool(
-    'fpt_admin_owners_remove',
-    {
-      description: 'Remove a Discord owner (admin.owners.remove). Requires admin scope.',
-      inputSchema: {
-        user_id: z.string().describe('Discord user ID'),
-      },
-    },
-    async ({ user_id }) => {
-      const result = await client.post<any>('/actions/admin.owners.remove', { user_id });
-      return mcpText(JSON.stringify(result, null, 2));
-    }
-  );
-
-  server.registerTool(
     'fpt_cron_run',
     {
       description:
