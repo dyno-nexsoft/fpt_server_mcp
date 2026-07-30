@@ -1,9 +1,8 @@
 # fpt_server MCP Server
 
-A Model Context Protocol (MCP) server for the `fpt_server` CI/build REST API
-(see `E:\Projects\fpt_server\docs\rest-api.md` for the underlying API this
-wraps). Lets an AI assistant trigger builds, watch job state, and drive the
-build queue directly from chat.
+A Model Context Protocol (MCP) server for the `fpt_server` CI/build REST API.
+Lets an AI assistant trigger builds, watch job state, and drive the build
+queue directly from chat.
 
 ## Features
 
@@ -51,16 +50,16 @@ build queue directly from chat.
 - No SSE tool: an MCP tool call is request/response, not a long-lived stream.
   Real-time log tailing is exposed instead as `fpt_get_job_log`'s
   offset-based polling — call it again with the returned `nextOffset`.
-- The server's public URL rotates on every `cloudflared` restart. Update
-  `FPT_SERVER_BASE_URL` when it changes; there is no way to discover the new
-  URL from inside this MCP server.
+- The server's public URL may change over time. Update `FPT_SERVER_BASE_URL`
+  when it does; there is no way to discover the new URL from inside this MCP
+  server.
 
 ## Configuration
 
 Create a `.env` file in the project root (or pass via MCP client `env` block):
 
 ```env
-FPT_SERVER_BASE_URL=https://<current-tunnel>.trycloudflare.com/api/v1
+FPT_SERVER_BASE_URL=https://<fpt-server-host>/api/v1
 FPT_SERVER_API_KEY=<secret>
 ```
 
@@ -68,20 +67,44 @@ FPT_SERVER_API_KEY=<secret>
 
 This server communicates via stdio transport.
 
+Every push of a `vX.Y.Z` tag publishes `@dyno-nexsoft/fpt_server_mcp` to GitHub
+Packages (see `.github/workflows/publish.yml`). GitHub Packages requires
+authentication even for reads, so each person needs a GitHub PAT with
+`read:packages` scope and a `.npmrc` pointing the scope at that registry:
+
+```ini
+# ~/.npmrc (or a project-local .npmrc)
+@dyno-nexsoft:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=<your GitHub PAT with read:packages>
+```
+
+Then reference it in the MCP client config without a local checkout:
+
 ```json
 {
   "mcpServers": {
     "fpt_server": {
-      "command": "node",
-      "args": ["E:/Projects/fpt_server_mcp/build/index.js"],
+      "command": "npx",
+      "args": ["-y", "@dyno-nexsoft/fpt_server_mcp"],
       "env": {
-        "FPT_SERVER_BASE_URL": "https://<current-tunnel>.trycloudflare.com/api/v1",
+        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
         "FPT_SERVER_API_KEY": "<secret>"
       }
     }
   }
 }
 ```
+
+### Releasing a new version
+
+```bash
+npm version patch   # or minor / major — bumps package.json and creates a git tag
+git push origin main --tags
+```
+
+The tag push triggers the `publish` workflow, which builds, tests, and
+publishes the new version. No `NPM_TOKEN` secret is needed — publishing uses
+the workflow's built-in `GITHUB_TOKEN`.
 
 ## Development
 

@@ -1,5 +1,5 @@
 {
-  "name": "fpt_server_mcp",
+  "name": "@dyno-nexsoft/fpt_server_mcp",
   "version": "0.1.0",
   "description": "MCP server for the fpt_server CI/build REST API",
   "main": "build/index.js",
@@ -7,6 +7,13 @@
     "fpt_server_mcp": "build/index.js"
   },
   "type": "module",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dyno-nexsoft/fpt_server_mcp.git"
+  },
   "files": [
     "build"
   ],
