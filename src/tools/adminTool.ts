@@ -17,8 +17,18 @@ const CRON_JOBS = [
 ] as const;
 
 /**
- * Registers `admin.apiKeys.*`, `admin.owners.*`, and `cron.run` — the
- * elevated-permission maintenance actions (`invoke`/`admin`/`invokeDangerous`).
+ * Registers `admin.apiKeys.*`, `admin.owners.*`, `cron.run`, and
+ * `system.hotReload`/`system.restart` — the elevated-permission maintenance
+ * actions (`invoke`/`admin`/`invokeDangerous`).
+ *
+ * `system.hotReload`/`system.restart` need an `admin`-tier API key, same as
+ * `admin.logs.tail`. `system.shutdown` is deliberately not here: it has no
+ * automatic recovery path, so the server keeps it off the REST surface
+ * entirely (reachable only via the Discord button's confirmation modal).
+ * Hold an admin key used for these two as privately as an SSH credential —
+ * `system.restart` runs `git pull` then reloads the process, so a leaked key
+ * is remote code execution on the build machine, not just an unwanted
+ * restart.
  */
 export function registerAdminTools(server: McpServer, client: FptServerClient): void {
   server.registerTool(
@@ -97,6 +107,33 @@ export function registerAdminTools(server: McpServer, client: FptServerClient): 
     },
     async ({ job }) => {
       const result = await client.post<any>('/actions/cron.run', { job });
+      return mcpText(JSON.stringify(result, null, 2));
+    }
+  );
+
+  server.registerTool(
+    'fpt_hot_reload',
+    {
+      description:
+        'Pull the latest code and hot reload without restarting the process (system.hotReload). Admin-only.',
+      inputSchema: {},
+    },
+    async () => {
+      const result = await client.post<any>('/actions/system.hotReload', {});
+      return mcpText(JSON.stringify(result, null, 2));
+    }
+  );
+
+  server.registerTool(
+    'fpt_restart',
+    {
+      description:
+        'Pull the latest code, install dependencies, and restart the bot process (system.restart). Admin-only — ' +
+        'the bot is briefly offline while the process reloads.',
+      inputSchema: {},
+    },
+    async () => {
+      const result = await client.post<any>('/actions/system.restart', {});
       return mcpText(JSON.stringify(result, null, 2));
     }
   );

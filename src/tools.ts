@@ -55,6 +55,8 @@ const client = new FptServerClient();
  * - `fpt_admin_apikeys_remove`   — Delete an API key.
  * - `fpt_admin_logs_tail`        — Read the last N lines of server.log.
  * - `fpt_cron_run`               — Run a scheduled job immediately.
+ * - `fpt_hot_reload`             — Pull latest code and hot reload (admin-only).
+ * - `fpt_restart`                — Pull latest code and restart the process (admin-only).
  * - `fpt_invoke_action`          — Generic dispatch for any action by name.
  *
  * @param server The MCP Server instance where the tools will be registered.
