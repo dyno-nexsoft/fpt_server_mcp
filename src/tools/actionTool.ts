@@ -11,7 +11,7 @@ function looksLikeJob(data: any): data is Job {
 /**
  * Registers the generic dispatch tool that reaches every REST-exposed
  * action by name, mirroring `POST /actions/{name}` directly. This is the
- * fallback for anything not covered by a dedicated tool (fpt_trigger_build,
+ * fallback for anything not covered by a dedicated tool (fpt_ci_build,
  * fpt_cancel_job, ...) — new server-side actions need no new tool here.
  * Use `fpt_describe_action` first to see the param schema for a given name.
  */

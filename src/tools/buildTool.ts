@@ -15,7 +15,7 @@ const BUILD_ENVIRONMENTS = ['dev', 'test', 'prod'] as const;
  */
 export function registerBuildTools(server: McpServer, client: FptServerClient): void {
   server.registerTool(
-    'fpt_trigger_build',
+    'fpt_ci_build',
     {
       description:
         'Trigger a CI build job (POST /builds, alias for the ci.build action). Returns immediately with a queued/running job.',

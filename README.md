@@ -18,26 +18,22 @@ queue directly from chat.
 | `fpt_cancel_job`              | Cancel a job                                                 |
 | `fpt_promote_job`             | Promote a queued job into the parallel lane                 |
 | `fpt_retry_job`               | Re-invoke the action recorded on a finished job              |
-| `fpt_trigger_build`           | Friendly alias for the `ci.build` action                     |
+| `fpt_ci_build`                | Friendly alias for the `ci.build` action                     |
 | `fpt_ci_gen`                  | Friendly alias for the `ci.gen` action                       |
 | `fpt_ci_replace`              | Friendly alias for the `ci.replace` action                   |
 | `fpt_ci_clean`                | Friendly alias for the `ci.clean` action (`invokeDangerous`) |
-| `fpt_gitlab_review`           | AI review a GitLab Merge Request from its URL                |
-| `fpt_gitlab_analyze`          | Static analysis for a Merge Request                          |
 | `fpt_zentao_report_start`     | Start today's Zentao daily report task                       |
 | `fpt_zentao_report_finish`    | Finish a Zentao daily report task                            |
 | `fpt_zentao_report_close`     | Close a Zentao daily report task                             |
 | `fpt_zentao_report_edit`      | Edit a Zentao daily report task                              |
 | `fpt_zentao_report_get`       | View a Zentao daily report task                              |
-| `fpt_attendance_status`       | View today's attendance status                               |
-| `fpt_attendance_checkin`      | Record today's check-in time                                 |
-| `fpt_attendance_subscribe`    | Subscribe to daily attendance reminders                      |
-| `fpt_attendance_unsubscribe`  | Unsubscribe from attendance reminders                        |
 | `fpt_admin_apikeys_list`      | List your API keys                                           |
 | `fpt_admin_apikeys_add`       | Create a new API key                                         |
 | `fpt_admin_apikeys_remove`    | Delete an API key                                            |
 | `fpt_admin_logs_tail`         | Read the last N lines of server.log (`admin` scope)          |
 | `fpt_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
+| `fpt_hot_reload`              | Pull latest code and hot reload, no restart (`admin` scope)  |
+| `fpt_restart`                 | Pull latest code and restart the process (`admin` scope)     |
 | `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
 
 **Design notes:**
@@ -125,10 +121,8 @@ src/
 └── tools/
     ├── metaTool.ts          # fpt_health · fpt_status · fpt_list_actions · fpt_describe_action
     ├── jobTool.ts           # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
-    ├── buildTool.ts         # fpt_trigger_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
-    ├── gitlabTool.ts        # fpt_gitlab_review · fpt_gitlab_analyze
+    ├── buildTool.ts         # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
     ├── zentaoTool.ts        # fpt_zentao_report_*
-    ├── attendanceTool.ts    # fpt_attendance_*
-    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run
+    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
     └── actionTool.ts        # fpt_invoke_action
 ```

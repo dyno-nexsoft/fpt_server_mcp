@@ -14,9 +14,7 @@ import { registerMetaTools } from './tools/metaTool.js';
 import { registerJobTools } from './tools/jobTool.js';
 import { registerBuildTools } from './tools/buildTool.js';
 import { registerActionTools } from './tools/actionTool.js';
-import { registerGitlabTools } from './tools/gitlabTool.js';
 import { registerZentaoTools } from './tools/zentaoTool.js';
-import { registerAttendanceTools } from './tools/attendanceTool.js';
 import { registerAdminTools } from './tools/adminTool.js';
 
 const client = new FptServerClient();
@@ -35,21 +33,15 @@ const client = new FptServerClient();
  * - `fpt_cancel_job`             — Cancel a job.
  * - `fpt_promote_job`            — Promote a queued job into the parallel lane.
  * - `fpt_retry_job`              — Re-invoke the action recorded on a finished job.
- * - `fpt_trigger_build`          — Friendly alias for the ci.build action.
+ * - `fpt_ci_build`               — Friendly alias for the ci.build action.
  * - `fpt_ci_gen`                 — Friendly alias for the ci.gen action.
  * - `fpt_ci_replace`             — Friendly alias for the ci.replace action.
  * - `fpt_ci_clean`               — Friendly alias for the ci.clean action.
- * - `fpt_gitlab_review`          — AI review a GitLab Merge Request.
- * - `fpt_gitlab_analyze`         — Static analysis for a Merge Request.
  * - `fpt_zentao_report_start`    — Start today's Zentao daily report task.
  * - `fpt_zentao_report_finish`   — Finish a Zentao daily report task.
  * - `fpt_zentao_report_close`    — Close a Zentao daily report task.
  * - `fpt_zentao_report_edit`     — Edit a Zentao daily report task.
  * - `fpt_zentao_report_get`      — View a Zentao daily report task.
- * - `fpt_attendance_status`      — View today's attendance status.
- * - `fpt_attendance_checkin`     — Record today's check-in time.
- * - `fpt_attendance_subscribe`   — Subscribe to attendance reminders.
- * - `fpt_attendance_unsubscribe` — Unsubscribe from attendance reminders.
  * - `fpt_admin_apikeys_list`     — List your API keys.
  * - `fpt_admin_apikeys_add`      — Create a new API key.
  * - `fpt_admin_apikeys_remove`   — Delete an API key.
@@ -65,9 +57,7 @@ export function registerTools(server: McpServer): void {
   registerMetaTools(server, client);
   registerJobTools(server, client);
   registerBuildTools(server, client);
-  registerGitlabTools(server, client);
   registerZentaoTools(server, client);
-  registerAttendanceTools(server, client);
   registerAdminTools(server, client);
   registerActionTools(server, client);
 }
