@@ -1,6 +1,6 @@
 {
   "name": "@dyno-nexsoft/fpt_server_mcp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "MCP server for the fpt_server CI/build REST API",
   "main": "build/index.js",
   "bin": {
