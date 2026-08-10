@@ -84,4 +84,26 @@ export function registerBuildTools(server: McpServer, client: FptServerClient): 
       return mcpText(`### Clean queued\n\n${jobToMarkdown(job)}`);
     }
   );
+
+  server.registerTool(
+    'fpt_autocomplete_branches',
+    {
+      description:
+        'Get a list of remote Git branches for autocomplete (GET /autocomplete/branches). ' +
+        'Helpful for selecting correct branch names when triggering builds.',
+      inputSchema: {
+        repo: z.enum(['tbchat', 'database', 'im', 'wallet', 'cloud_storage', 'socialfi']).optional().describe('Repository name (default: tbchat)'),
+        query: z.string().optional().describe('Filter/search string to match branches'),
+      },
+    },
+    async (params) => {
+      const queryParams = new URLSearchParams();
+      if (params.repo) queryParams.append('repo', params.repo);
+      if (params.query) queryParams.append('query', params.query);
+      const queryString = queryParams.toString();
+      const url = `/autocomplete/branches${queryString ? `?${queryString}` : ''}`;
+      const response = await client.get<{ branches: string[] }>(url);
+      return mcpText(response.branches.join('\n'));
+    }
+  );
 }
