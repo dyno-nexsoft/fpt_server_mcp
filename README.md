@@ -22,6 +22,7 @@ queue directly from chat.
 | `fpt_ci_gen`                  | Friendly alias for the `ci.gen` action                       |
 | `fpt_ci_replace`              | Friendly alias for the `ci.replace` action                   |
 | `fpt_ci_clean`                | Friendly alias for the `ci.clean` action (`invokeDangerous`) |
+| `fpt_ci_deploy`               | Friendly alias for the `ci.deploy` action — builds and deploys the web dashboard |
 | `fpt_zentao_report_start`     | Start today's Zentao daily report task                       |
 | `fpt_zentao_report_finish`    | Finish a Zentao daily report task                            |
 | `fpt_zentao_report_close`     | Close a Zentao daily report task                             |
@@ -121,7 +122,7 @@ src/
 └── tools/
     ├── metaTool.ts          # fpt_health · fpt_status · fpt_list_actions · fpt_describe_action
     ├── jobTool.ts           # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
-    ├── buildTool.ts         # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
+    ├── buildTool.ts         # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean · fpt_ci_deploy
     ├── zentaoTool.ts        # fpt_zentao_report_*
     ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
     └── actionTool.ts        # fpt_invoke_action
