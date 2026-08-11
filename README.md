@@ -44,9 +44,10 @@ queue directly from chat.
 - No SSE tool: an MCP tool call is request/response, not a long-lived stream.
   Real-time log tailing is exposed instead as `fpt_get_job_log`'s
   offset-based polling — call it again with the returned `nextOffset`.
-- The server's public URL may change over time. Update `FPT_SERVER_BASE_URL`
-  when it does; there is no way to discover the new URL from inside this MCP
-  server.
+- `fpt_server` is LAN-only, not published to the public internet. This MCP
+  server must run somewhere that can reach it directly — e.g. on the same
+  host, pointing `FPT_SERVER_BASE_URL` at `http://localhost:8080/api/v1` —
+  or over a VPN/LAN connection to it.
 
 ## Configuration
 
