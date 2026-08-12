@@ -86,28 +86,6 @@ export function registerBuildTools(server: McpServer, client: FptServerClient): 
   );
 
   server.registerTool(
-    'fpt_ci_deploy',
-    {
-      description:
-        'Build and deploy the web dashboard (POST /deploy, alias for ci.deploy). ' +
-        'Runs assets/deploy.sh on the build machine — the only sanctioned way to deploy it. ' +
-        'Returns a queued/running job.',
-      inputSchema: {
-        branch: z
-          .string()
-          .optional()
-          .describe(
-            'Branch of the fpt_server_website submodule. Empty rebuilds whatever commit it is currently pinned to.'
-          ),
-      },
-    },
-    async (params) => {
-      const job = await client.post<Job>('/deploy', params);
-      return mcpText(`### Deploy queued\n\n${jobToMarkdown(job)}`);
-    }
-  );
-
-  server.registerTool(
     'fpt_autocomplete_branches',
     {
       description:
