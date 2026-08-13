@@ -48,7 +48,7 @@ export function registerMetaTools(server: McpServer, client: FptServerClient): v
     async () => {
       const health = await client.get<any>('/health');
       return mcpText(
-        `- **ok**: ${health.ok}\n- **version**: ${health.version}\n- **uptimeSeconds**: ${health.uptimeSeconds}\n- **hostname**: ${health.hostname}\n- **publicUrl**: ${health.publicUrl}`
+        `- **ok**: ${health.ok}\n- **version**: ${health.version}\n- **uptimeSeconds**: ${health.uptime_seconds}\n- **hostname**: ${health.hostname}\n- **publicUrl**: ${health.publicUrl}`
       );
     }
   );
@@ -63,9 +63,9 @@ export function registerMetaTools(server: McpServer, client: FptServerClient): v
       const status = await client.get<any>('/status');
       const header = [
         `- **hostname**: ${status.hostname}`,
-        `- **dartVersion**: ${status.dartVersion}`,
+        `- **dartVersion**: ${status.dart_version}`,
         `- **uptime**: ${status.uptime}`,
-        `- **workingDirectory**: ${status.workingDirectory}`,
+        `- **workingDirectory**: ${status.working_directory}`,
       ].join('\n');
       const running = jobsToMarkdown((status.running || []) as Job[]);
       const queued = jobsToMarkdown((status.queued || []) as Job[]);

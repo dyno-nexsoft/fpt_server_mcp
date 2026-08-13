@@ -19,10 +19,10 @@ export function registerZentaoTools(server: McpServer, client: FptServerClient):
       },
     },
     async ({ description }) => {
-      const result = await client.post<{ task_id: number; message: string }>('/actions/zentao.report.start', {
+      const result = await client.post<{ task_id: number; summary: string }>('/actions/zentao.report.start', {
         description,
       });
-      return mcpText(`- **task_id**: ${result.task_id}\n- **message**: ${result.message}`);
+      return mcpText(`- **task_id**: ${result.task_id}\n- **summary**: ${result.summary}`);
     }
   );
 
