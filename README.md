@@ -4,6 +4,10 @@ A Model Context Protocol (MCP) server for the `fpt_server` CI/build REST API.
 Lets an AI assistant trigger builds, watch job state, and drive the build
 queue directly from chat.
 
+Written in Dart (`package:dart_mcp`), matching the rest of the org's stack —
+this used to be TypeScript; see git history before the v3.0.0 rewrite for
+that implementation.
+
 ## Features
 
 | Tool                          | Description                                                |
@@ -47,10 +51,15 @@ queue directly from chat.
   server must run somewhere that can reach it directly — e.g. on the same
   host, pointing `FPT_SERVER_BASE_URL` at `http://localhost:8080/api/v1` —
   or over a VPN/LAN connection to it.
+- Wire types (`Job`, `Health`, `SystemStatus`, `ActionSchema`, ...) come from
+  [`fpt_server_shared`](https://github.com/dyno-nexsoft/fpt_server_shared),
+  the same package the backend and dashboard use — this is a third consumer
+  of it, not a fourth hand-copied set of models.
 
 ## Configuration
 
-Create a `.env` file in the project root (or pass via MCP client `env` block):
+Set these as real OS environment variables (not `--dart-define`) — via a
+`.env` you source before running, or the MCP client's own `env` block:
 
 ```env
 FPT_SERVER_BASE_URL=https://<fpt-server-host>/api/v1
@@ -59,27 +68,18 @@ FPT_SERVER_API_KEY=<secret>
 
 ## MCP Client Integration
 
-This server communicates via stdio transport.
-
-Every push of a `vX.Y.Z` tag publishes `@dyno-nexsoft/fpt_server_mcp` to GitHub
-Packages (see `.github/workflows/publish.yml`). GitHub Packages requires
-authentication even for reads, so each person needs a GitHub PAT with
-`read:packages` scope and a `.npmrc` pointing the scope at that registry:
-
-```ini
-# ~/.npmrc (or a project-local .npmrc)
-@dyno-nexsoft:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=<your GitHub PAT with read:packages>
-```
-
-Then reference it in the MCP client config without a local checkout:
+This server communicates via stdio transport. Requires a local checkout with
+`fpt_server_shared` available as a sibling directory (`../fpt_server_shared`)
+— the normal case when this repo is checked out as a submodule of the parent
+`fpt_server` repo, since that's where both this repo and `fpt_server_shared`
+already live side by side.
 
 ```json
 {
   "mcpServers": {
     "fpt_server": {
-      "command": "npx",
-      "args": ["-y", "@dyno-nexsoft/fpt_server_mcp"],
+      "command": "dart",
+      "args": ["run", "/path/to/fpt_server/fpt_server_mcp/bin/fpt_server_mcp.dart"],
       "env": {
         "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
         "FPT_SERVER_API_KEY": "<secret>"
@@ -89,41 +89,49 @@ Then reference it in the MCP client config without a local checkout:
 }
 ```
 
-### Releasing a new version
+Or point at a compiled executable (built via `dart compile exe
+bin/fpt_server_mcp.dart -o fpt_server_mcp`, or downloaded from a
+[release](../../releases)) instead of `dart run`, for faster startup:
 
-```bash
-npm version patch   # or minor / major — bumps package.json and creates a git tag
-git push origin main --tags
+```json
+{
+  "mcpServers": {
+    "fpt_server": {
+      "command": "/path/to/fpt_server_mcp",
+      "env": {
+        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
+        "FPT_SERVER_API_KEY": "<secret>"
+      }
+    }
+  }
+}
 ```
-
-The tag push triggers the `publish` workflow, which builds, tests, and
-publishes the new version. No `NPM_TOKEN` secret is needed — publishing uses
-the workflow's built-in `GITHUB_TOKEN`.
 
 ## Development
 
 ```bash
-npm install
-npm run build      # Compile TypeScript
-npm run dev        # Watch mode
-npm test           # Unit tests (Jest)
+dart pub get
+dart analyze
+dart test
+dart run bin/fpt_server_mcp.dart   # runs the server directly against stdio
 ```
 
 ### Project structure
 
 ```
-src/
-├── index.ts               # MCP server entry point
-├── fptClient.ts            # Axios client: API key header, selective GET cache
-├── tools.ts                # Thin orchestrator
-├── utils/
-│   ├── mcpResponse.ts       # mcpText · mcpError
-│   └── jobFormatter.ts      # Job type · jobToMarkdown · jobsToMarkdown
+bin/
+└── fpt_server_mcp.dart      # Entry point — connects the server to stdio
+
+lib/src/
+├── server.dart               # FptMcpServer: registers every tool group
+├── fpt_client.dart           # http client: API key header, selective GET cache
+├── job_formatter.dart        # jobToMarkdown · jobsToMarkdown
+├── mcp_response.dart         # mcpText
 └── tools/
-    ├── metaTool.ts          # fpt_health · fpt_status · fpt_list_actions · fpt_describe_action
-    ├── jobTool.ts           # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
-    ├── buildTool.ts         # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
-    ├── zentaoTool.ts        # fpt_zentao_report_*
-    ├── adminTool.ts         # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
-    └── actionTool.ts        # fpt_invoke_action
+    ├── meta_tool.dart         # fpt_health · fpt_status · fpt_list_actions · fpt_describe_action
+    ├── job_tool.dart          # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
+    ├── build_tool.dart        # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
+    ├── zentao_tool.dart       # fpt_zentao_report_*
+    ├── admin_tool.dart        # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
+    └── action_tool.dart       # fpt_invoke_action
 ```

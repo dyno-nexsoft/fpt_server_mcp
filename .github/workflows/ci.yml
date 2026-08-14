@@ -11,9 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # This repo's pubspec depends on fpt_server_shared via `path:
+      # ../fpt_server_shared` — normally satisfied by both living as sibling
+      # submodules inside the parent fpt_server checkout. A standalone CI
+      # checkout of just this repo needs that sibling fetched explicitly.
+      - uses: actions/checkout@v4
         with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+          repository: dyno-nexsoft/fpt_server_shared
+          path: ../fpt_server_shared
+      - uses: dart-lang/setup-dart@v1
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart test

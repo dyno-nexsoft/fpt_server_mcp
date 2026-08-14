@@ -1,0 +1,17 @@
+name: fpt_server_mcp
+description: MCP server for the fpt_server CI/build REST API.
+publish_to: none
+version: 3.0.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  dart_mcp: ^0.5.2
+  fpt_server_shared:
+    path: ../fpt_server_shared
+  http: ^1.2.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.25.0
