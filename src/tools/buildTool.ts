@@ -76,7 +76,7 @@ export function registerBuildTools(server: McpServer, client: FptServerClient): 
         'Clean build artifacts and dependencies (POST /cleans, alias for ci.clean). Runs `git clean` under the hood ' +
         '— recoverable, but requires invokeDangerous. Returns a queued/running job.',
       inputSchema: {
-        mode: z.enum(['--full', '--files']).optional().describe('Empty = same as /cleans with no mode'),
+        mode: z.enum(['full', 'files']).optional().describe('Empty = same as /cleans with no mode'),
       },
     },
     async (params) => {

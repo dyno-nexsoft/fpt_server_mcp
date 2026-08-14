@@ -6,7 +6,6 @@ import { mcpText } from '../utils/mcpResponse.js';
 const CRON_JOBS = [
   'CleanupCacheJob',
   'DailyReportStartJob',
-  'MrReviewCheckJob',
   'AttendanceReminderJob',
   'AttendanceCheckoutJob',
   'AttendanceDisableButtonsJob',
