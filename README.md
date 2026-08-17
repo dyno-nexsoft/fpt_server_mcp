@@ -107,6 +107,32 @@ bin/fpt_server_mcp.dart -o fpt_server_mcp`, or downloaded from a
 }
 ```
 
+### opencode
+
+[opencode](https://opencode.ai)'s `opencode.jsonc` uses a different shape for
+local MCP servers: `type: "local"` is required, `command` is a single array
+(the executable and every argument combined, not split into `command`+`args`),
+and the env block is called `environment`, not `env`:
+
+```jsonc
+{
+  "mcp": {
+    "fpt_server": {
+      "type": "local",
+      "command": [
+        "dart",
+        "run",
+        "/path/to/fpt_server/fpt_server_mcp/bin/fpt_server_mcp.dart"
+      ],
+      "environment": {
+        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
+        "FPT_SERVER_API_KEY": "<secret>"
+      }
+    }
+  }
+}
+```
+
 ## Development
 
 ```bash
