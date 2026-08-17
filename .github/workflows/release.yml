@@ -13,10 +13,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # See ci.yml: actions/checkout refuses to write outside this job's repo
+      # directory, so the sibling goes inside this checkout instead, resolved
+      # via a pubspec_overrides.yaml that's never committed.
       - uses: actions/checkout@v4
         with:
           repository: dyno-nexsoft/fpt_server_shared
-          path: ../fpt_server_shared
+          path: fpt_server_shared
+      - run: |
+          cat > pubspec_overrides.yaml <<'EOF'
+          dependency_overrides:
+            fpt_server_shared:
+              path: fpt_server_shared
+          EOF
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
       - run: dart test

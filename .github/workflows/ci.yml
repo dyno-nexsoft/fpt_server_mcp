@@ -13,12 +13,21 @@ jobs:
       - uses: actions/checkout@v4
       # This repo's pubspec depends on fpt_server_shared via `path:
       # ../fpt_server_shared` — normally satisfied by both living as sibling
-      # submodules inside the parent fpt_server checkout. A standalone CI
-      # checkout of just this repo needs that sibling fetched explicitly.
+      # submodules inside the parent fpt_server checkout. actions/checkout
+      # refuses to write outside the job's own repo directory, so a standalone
+      # CI checkout fetches the sibling *inside* this checkout instead, and a
+      # pubspec_overrides.yaml (never committed) points pub at it there —
+      # without touching the committed `path: ../fpt_server_shared`.
       - uses: actions/checkout@v4
         with:
           repository: dyno-nexsoft/fpt_server_shared
-          path: ../fpt_server_shared
+          path: fpt_server_shared
+      - run: |
+          cat > pubspec_overrides.yaml <<'EOF'
+          dependency_overrides:
+            fpt_server_shared:
+              path: fpt_server_shared
+          EOF
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
       - run: dart analyze --fatal-infos
