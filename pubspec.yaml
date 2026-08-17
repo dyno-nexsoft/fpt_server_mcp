@@ -1,7 +1,7 @@
 name: fpt_server_mcp
 description: MCP server for the fpt_server CI/build REST API.
 publish_to: none
-version: 3.0.0
+version: 3.0.1
 
 environment:
   sdk: ^3.6.0
