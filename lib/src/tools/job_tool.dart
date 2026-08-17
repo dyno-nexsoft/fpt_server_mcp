@@ -6,13 +6,12 @@ import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
 
-const _jobStates = [
-  'queued',
-  'running',
-  'succeeded',
-  'failed',
-  'cancelled',
-  'interrupted',
+/// Wire values a caller may filter by — every [JobState] except [JobState.unknown],
+/// which only ever appears on a value *received* from the server, never one
+/// a caller would deliberately filter for.
+final _jobStates = [
+  for (final state in JobState.values)
+    if (state != JobState.unknown) state.toWire(),
 ];
 
 /// Registers job lifecycle tools: list/get/log/cancel/promote/retry.
