@@ -12,24 +12,24 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      # See ci.yml: both repos are checked out as true siblings under the
+      # job's workspace root so the committed `path: ../fpt_server_shared`
+      # resolves correctly, since actions/checkout refuses to write outside
+      # the job's own repo directory.
       - uses: actions/checkout@v4
-      # See ci.yml: actions/checkout refuses to write outside this job's repo
-      # directory, so the sibling goes inside this checkout instead, resolved
-      # via a pubspec_overrides.yaml that's never committed.
+        with:
+          path: fpt_server_mcp
       - uses: actions/checkout@v4
         with:
           repository: dyno-nexsoft/fpt_server_shared
           path: fpt_server_shared
-      - run: |
-          cat > pubspec_overrides.yaml <<'EOF'
-          dependency_overrides:
-            fpt_server_shared:
-              path: fpt_server_shared
-          EOF
       - uses: dart-lang/setup-dart@v1
-      - run: dart pub get
-      - run: dart test
-      - run: dart compile exe bin/fpt_server_mcp.dart -o fpt_server_mcp
+      - working-directory: fpt_server_mcp
+        run: dart pub get
+      - working-directory: fpt_server_mcp
+        run: dart test
+      - working-directory: fpt_server_mcp
+        run: dart compile exe bin/fpt_server_mcp.dart -o fpt_server_mcp
       - uses: softprops/action-gh-release@v2
         with:
-          files: fpt_server_mcp
+          files: fpt_server_mcp/fpt_server_mcp

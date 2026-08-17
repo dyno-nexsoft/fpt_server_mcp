@@ -10,25 +10,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
       # This repo's pubspec depends on fpt_server_shared via `path:
       # ../fpt_server_shared` — normally satisfied by both living as sibling
       # submodules inside the parent fpt_server checkout. actions/checkout
-      # refuses to write outside the job's own repo directory, so a standalone
-      # CI checkout fetches the sibling *inside* this checkout instead, and a
-      # pubspec_overrides.yaml (never committed) points pub at it there —
-      # without touching the committed `path: ../fpt_server_shared`.
+      # refuses to write outside the job's own repo directory, so both repos
+      # are checked out as true siblings directly under the job's workspace
+      # root instead of the default nested layout — that keeps the committed
+      # `path: ../fpt_server_shared` correct as-is, no pubspec_overrides.yaml
+      # needed (which satisfies `dart pub get` but not `dart analyze`, which
+      # independently validates the pubspec's declared path regardless of
+      # any override).
+      - uses: actions/checkout@v4
+        with:
+          path: fpt_server_mcp
       - uses: actions/checkout@v4
         with:
           repository: dyno-nexsoft/fpt_server_shared
           path: fpt_server_shared
-      - run: |
-          cat > pubspec_overrides.yaml <<'EOF'
-          dependency_overrides:
-            fpt_server_shared:
-              path: fpt_server_shared
-          EOF
       - uses: dart-lang/setup-dart@v1
-      - run: dart pub get
-      - run: dart analyze --fatal-infos
-      - run: dart test
+      - working-directory: fpt_server_mcp
+        run: dart pub get
+      - working-directory: fpt_server_mcp
+        run: dart analyze --fatal-infos
+      - working-directory: fpt_server_mcp
+        run: dart test
