@@ -160,11 +160,23 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       description:
           'Pull the latest code, install dependencies, and restart the bot '
           'process (system.restart). Admin-only — the bot is briefly '
-          'offline while the process reloads.',
-      inputSchema: Schema.object(),
+          'offline while the process reloads. Pass when_idle to wait until '
+          'no builds are running or queued instead of restarting immediately '
+          '(interrupting an in-flight build the moment it restarts).',
+      inputSchema: Schema.object(
+        properties: {
+          'when_idle': Schema.bool(
+            description: 'Wait until no builds are running or queued before '
+                'restarting, instead of restarting right away',
+          ),
+        },
+      ),
     ),
     (request) async {
-      final result = await client.postJson('/actions/system.restart');
+      final whenIdle = request.arguments?['when_idle'] as bool?;
+      final result = await client.postJson('/actions/system.restart', {
+        if (whenIdle != null) 'when_idle': whenIdle,
+      });
       return mcpText(_pretty(result));
     },
   );
