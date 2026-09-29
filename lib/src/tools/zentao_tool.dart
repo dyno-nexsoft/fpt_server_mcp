@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:dart_mcp/server.dart';
 import '../server.dart';
 
 import '../fpt_client.dart';
+import '../markdown.dart';
 import '../mcp_response.dart';
 
 /// Registers the `zentao.report.*`/`zentao.unlink` tools. Every one of these
@@ -19,7 +18,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       inputSchema: Schema.object(
         properties: {
           'description':
-              Schema.string(description: 'Nội dung báo cáo (Markdown)'),
+              Schema.string(description: 'Report content (Markdown)'),
         },
         required: ['description'],
       ),
@@ -29,9 +28,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
         '/actions/zentao.report.start',
         request.arguments ?? const {},
       );
-      return mcpText(
-        '- **task_id**: ${result['task_id']}\n- **summary**: ${result['summary']}',
-      );
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -41,7 +38,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       description:
           "Mark today's daily report task as finished (zentao.report.finish).",
       inputSchema: Schema.object(
-        properties: {'task_id': Schema.int(description: 'ID task Zentao')},
+        properties: {'task_id': Schema.int(description: 'Zentao task id')},
         required: ['task_id'],
       ),
     ),
@@ -50,7 +47,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
         '/actions/zentao.report.finish',
         request.arguments ?? const {},
       );
-      return mcpText(const JsonEncoder.withIndent('  ').convert(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -59,7 +56,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       name: 'fpt_zentao_report_close',
       description: 'Close a completed daily report task (zentao.report.close).',
       inputSchema: Schema.object(
-        properties: {'task_id': Schema.int(description: 'ID task Zentao')},
+        properties: {'task_id': Schema.int(description: 'Zentao task id')},
         required: ['task_id'],
       ),
     ),
@@ -68,7 +65,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
         '/actions/zentao.report.close',
         request.arguments ?? const {},
       );
-      return mcpText(const JsonEncoder.withIndent('  ').convert(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -79,8 +76,8 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
           'Edit the content of a daily report task (zentao.report.edit).',
       inputSchema: Schema.object(
         properties: {
-          'task_id': Schema.int(description: 'ID task Zentao'),
-          'description': Schema.string(description: 'Nội dung mới (Markdown)'),
+          'task_id': Schema.int(description: 'Zentao task id'),
+          'description': Schema.string(description: 'New content (Markdown)'),
         },
         required: ['task_id', 'description'],
       ),
@@ -90,7 +87,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
         '/actions/zentao.report.edit',
         request.arguments ?? const {},
       );
-      return mcpText(const JsonEncoder.withIndent('  ').convert(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -100,7 +97,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       description:
           'View full detail of a daily report task (zentao.report.get).',
       inputSchema: Schema.object(
-        properties: {'task_id': Schema.int(description: 'ID task Zentao')},
+        properties: {'task_id': Schema.int(description: 'Zentao task id')},
         required: ['task_id'],
       ),
     ),
@@ -109,7 +106,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
         '/actions/zentao.report.get',
         request.arguments ?? const {},
       );
-      return mcpText(const JsonEncoder.withIndent('  ').convert(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 }

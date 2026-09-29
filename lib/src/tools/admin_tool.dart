@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:dart_mcp/server.dart';
 import '../server.dart';
 
 import '../fpt_client.dart';
+import '../markdown.dart';
 import '../mcp_response.dart';
-
-String _pretty(Map<String, dynamic> json) =>
-    const JsonEncoder.withIndent('  ').convert(json);
 
 /// Registers `admin.apiKeys.*`, `cron.run`, and `system.hotReload`/
 /// `system.restart` — the elevated-permission maintenance actions
@@ -31,7 +27,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final result = await client.postJson('/actions/admin.apiKeys.list');
-      return mcpText(_pretty(result));
+      return mcpText(apiKeysToMarkdown(result));
     },
   );
 
@@ -44,7 +40,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       inputSchema: Schema.object(
         properties: {
           'name': Schema.string(
-            description: 'Tên hiển thị (audit log, CREATED_BY trên build)',
+            description: 'Display name (audit log, CREATED_BY on builds)',
           ),
         },
         required: ['name'],
@@ -55,7 +51,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         '/actions/admin.apiKeys.add',
         request.arguments ?? const {},
       );
-      return mcpText(_pretty(result));
+      return mcpText(apiKeyCreatedToMarkdown(result));
     },
   );
 
@@ -65,7 +61,9 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       description: 'Delete one of your API keys — an owner can delete any key '
           '(admin.apiKeys.remove).',
       inputSchema: Schema.object(
-        properties: {'id': Schema.string(description: 'Định danh key cần xoá')},
+        properties: {
+          'id': Schema.string(description: 'Id of the key to delete')
+        },
         required: ['id'],
       ),
     ),
@@ -74,7 +72,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         '/actions/admin.apiKeys.remove',
         request.arguments ?? const {},
       );
-      return mcpText(_pretty(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -89,7 +87,8 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
           'lines': Schema.int(
             minimum: 1,
             maximum: 1000,
-            description: 'Số dòng cuối muốn xem (mặc định 200, tối đa 1000)',
+            description:
+                'How many trailing lines to read (default 200, max 1000)',
           ),
         },
       ),
@@ -99,7 +98,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         '/actions/admin.logs.tail',
         request.arguments ?? const {},
       );
-      return mcpText(_pretty(result));
+      return mcpText(logLinesToMarkdown(result));
     },
   );
 
@@ -125,7 +124,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         '/actions/cron.run',
         request.arguments ?? const {},
       );
-      return mcpText(_pretty(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -138,7 +137,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final result = await client.postJson('/actions/system.hotReload');
-      return mcpText(_pretty(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 
@@ -165,7 +164,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       final result = await client.postJson('/actions/system.restart', {
         if (whenIdle != null) 'when_idle': whenIdle,
       });
-      return mcpText(_pretty(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 }

@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:dart_mcp/server.dart';
 import 'package:fpt_server_shared/fpt_server_shared.dart' as shared;
 
 import '../fpt_client.dart';
 import '../job_formatter.dart';
+import '../markdown.dart';
 import '../mcp_response.dart';
 import '../server.dart';
 
@@ -48,7 +47,7 @@ void registerActionTools(FptMcpServer server, FptClient client) {
       if (_looksLikeJob(result)) {
         return mcpText(jobToMarkdown(shared.Job.fromJson(result)));
       }
-      return mcpText(const JsonEncoder.withIndent('  ').convert(result));
+      return mcpText(resultToMarkdown(result));
     },
   );
 }

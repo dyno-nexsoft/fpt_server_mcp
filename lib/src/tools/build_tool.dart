@@ -43,7 +43,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
             values: _buildEnvironments,
             description: 'Build environment (default: dev)',
           ),
-          'release_notes': Schema.string(description: 'Ghi chú phát hành'),
+          'release_notes': Schema.string(description: 'Release notes'),
         },
         required: ['tbchat', 'database'],
       ),
@@ -154,7 +154,8 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
       final qs = query.isEmpty ? '' : '?${Uri(queryParameters: query).query}';
       final json = await client.getJson('/autocomplete/branches$qs');
       final branches = (json['branches'] as List).cast<String>();
-      return mcpText(branches.join('\n'));
+      if (branches.isEmpty) return mcpText('_No matching branches._');
+      return mcpText(branches.map((branch) => '- `$branch`').join('\n'));
     },
   );
 }
