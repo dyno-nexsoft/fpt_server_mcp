@@ -91,8 +91,11 @@ String apiKeyCreatedToMarkdown(Map<String, dynamic> json) {
 /// interesting lines were even reached.
 const logTailMaxChars = 12000;
 
-/// `admin.logs.tail`: the newest lines as a code block, ready to read or
-/// paste.
+/// `admin.logs.tail`: the lines as a code block, ready to read or paste.
+///
+/// When the reply carries `first_line`, every line is prefixed with its
+/// absolute number and a header gives the range and the log's length — the
+/// numbers a later `from_line`/`to_line` call means.
 ///
 /// [contains] keeps only the lines holding that text (case-insensitive) —
 /// the way to find one thing in a log that is mostly polling — and [limit]
@@ -106,39 +109,60 @@ String logLinesToMarkdown(
   int maxChars = logTailMaxChars,
 }) {
   final needle = contains?.trim().toLowerCase();
-  var lines = [
-    for (final line in json['lines'] as List<dynamic>? ?? const [])
-      if ('$line'.isNotEmpty &&
+  final firstLine = (json['first_line'] as num?)?.toInt();
+  final totalLines = (json['total_lines'] as num?)?.toInt();
+  final raw = json['lines'] as List<dynamic>? ?? const [];
+
+  // (number, text) — numbered before filtering, so a filtered line keeps
+  // the number it has in the file.
+  var entries = [
+    for (var i = 0; i < raw.length; i++)
+      if ('${raw[i]}'.isNotEmpty &&
           (needle == null ||
               needle.isEmpty ||
-              '$line'.toLowerCase().contains(needle)))
-        '$line',
+              '${raw[i]}'.toLowerCase().contains(needle)))
+        (firstLine == null ? null : firstLine + i, '${raw[i]}'),
   ];
-  if (lines.isEmpty) {
+  if (entries.isEmpty) {
     return needle == null || needle.isEmpty
-        ? '_The log is empty._'
+        ? (raw.isEmpty && firstLine != null && totalLines != null
+            ? '_No lines there — the log has $totalLines._'
+            : '_The log is empty._')
         : '_No recent log line contains `$contains`._';
   }
-  if (lines.length > limit) lines = lines.sublist(lines.length - limit);
+  if (entries.length > limit) {
+    entries = entries.sublist(entries.length - limit);
+  }
+
+  final width = entries.last.$1?.toString().length ?? 0;
+  final rendered = [
+    for (final (number, text) in entries)
+      number == null ? text : '${number.toString().padLeft(width)}  $text',
+  ];
 
   var total = 0;
-  var keepFrom = lines.length;
-  while (keepFrom > 0 && total + lines[keepFrom - 1].length + 1 <= maxChars) {
+  var keepFrom = rendered.length;
+  while (
+      keepFrom > 0 && total + rendered[keepFrom - 1].length + 1 <= maxChars) {
     keepFrom--;
-    total += lines[keepFrom].length + 1;
+    total += rendered[keepFrom].length + 1;
   }
   // A single line longer than the whole budget still shows, cut short,
   // rather than an empty block.
-  if (keepFrom == lines.length) {
-    final last = lines.last;
-    return _codeBlock([last.substring(0, maxChars)]);
+  if (keepFrom == rendered.length) {
+    return _codeBlock([rendered.last.substring(0, maxChars)]);
   }
-  final cut = keepFrom;
-  final block = _codeBlock(lines.sublist(keepFrom));
-  return cut == 0
-      ? block
-      : '_$cut older line(s) left out to stay under $maxChars characters — '
-          'ask for fewer `lines` or filter with `contains`._\n\n$block';
+
+  final shown = entries.sublist(keepFrom);
+  final notes = [
+    if (shown.first.$1 != null && totalLines != null)
+      'Lines ${shown.first.$1}–${shown.last.$1} of $totalLines.',
+    if (keepFrom > 0)
+      '$keepFrom older line(s) left out to stay under $maxChars characters — '
+          'ask for fewer `lines`, a narrower range, or filter with `contains`.',
+  ];
+  final block = _codeBlock(rendered.sublist(keepFrom));
+  return notes.isEmpty ? block : '_${notes.join(' ')}_\n\n$block';
 }
 
 /// A tool failure as one short Markdown message, in place of the raw exception

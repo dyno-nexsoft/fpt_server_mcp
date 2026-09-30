@@ -150,6 +150,37 @@ void main() {
       expect(out, isNot(contains('line-6')));
     });
 
+    test('with first_line every line is numbered and the range is stated', () {
+      final out = logLinesToMarkdown({
+        'lines': ['a', 'b', 'c'],
+        'first_line': 98,
+        'total_lines': 100,
+      });
+      expect(out, startsWith('_Lines 98–100 of 100._'));
+      expect(out, contains('\n 98  a\n 99  b\n100  c\n'));
+    });
+
+    test('a filtered line keeps the number it has in the file', () {
+      final out = logLinesToMarkdown({
+        'lines': ['poll', 'poll', 'boom', 'poll'],
+        'first_line': 10,
+        'total_lines': 13,
+      }, contains: 'boom');
+      expect(out, startsWith('_Lines 12–12 of 13._'));
+      expect(out, contains('12  boom'));
+    });
+
+    test('a range with nothing in it says how long the log is', () {
+      expect(
+        logLinesToMarkdown({
+          'lines': [],
+          'first_line': 50,
+          'total_lines': 5,
+        }),
+        '_No lines there — the log has 5._',
+      );
+    });
+
     test('one line bigger than the whole budget is cut, not dropped', () {
       final out = logLinesToMarkdown({
         'lines': ['x' * 50],

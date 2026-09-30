@@ -83,24 +83,38 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
   server.registerTool(
     Tool(
       name: 'fpt_admin_logs_tail',
-      description: 'Read the last N lines of server.log for debugging '
-          '(admin.logs.tail). Admin-only — the log records every request '
-          'URL and is not otherwise reachable.',
+      description: 'Read server.log for debugging (admin.logs.tail). '
+          'Admin-only — the log records every request URL and is not '
+          'otherwise reachable. By default the newest lines; every reply '
+          'says which line numbers it shows and how long the log is, and '
+          '`from_line`/`to_line` read any range by those numbers.',
       inputSchema: Schema.object(
         properties: {
           'lines': Schema.int(
             minimum: 1,
             maximum: 500,
-            description: 'How many of the newest lines to return '
-                '(default 100, max 500). The reply is also capped at about '
-                '12k characters, dropping the oldest lines first.',
+            description: 'How many lines to return (default 100, max 500): '
+                'the newest ones, or — with only `from_line` — that many '
+                'starting there, or — with only `to_line` — that many ending '
+                'there. The reply is also capped at about 12k characters, '
+                'dropping the oldest lines first.',
+          ),
+          'from_line': Schema.int(
+            minimum: 1,
+            description: 'First line to return, by the absolute 1-based '
+                'numbers a previous reply showed.',
+          ),
+          'to_line': Schema.int(
+            minimum: 1,
+            description: 'Last line to return, inclusive.',
           ),
           'contains': Schema.string(
-            description: 'Only lines containing this text (case-insensitive), '
-                'searched across the last $_filterScanLines lines of the '
-                'log. Most of the log is one audit line per dashboard poll, '
-                'so filtering (e.g. "SEVERE", "review", an error message) is '
-                'usually the way to find what you want.',
+            description: 'Only lines containing this text (case-insensitive) '
+                '— searched across the last $_filterScanLines lines, or '
+                'within the from/to range when one is given. Most of the log '
+                'is one audit line per dashboard poll, so filtering (e.g. '
+                '"SEVERE", "review", an error message) is usually the way to '
+                'find what you want. Matches keep their real line numbers.',
           ),
         },
       ),
@@ -108,16 +122,26 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
     (request) async {
       final args = request.arguments ?? const {};
       final lines = ((args['lines'] as num?)?.toInt() ?? 100).clamp(1, 500);
+      final from = (args['from_line'] as num?)?.toInt();
+      final to = (args['to_line'] as num?)?.toInt();
       final contains = (args['contains'] as String?)?.trim();
       final filtering = contains != null && contains.isNotEmpty;
-      final result = await client.postJson(
-        '/actions/admin.logs.tail',
+      final ranged = from != null || to != null;
+      final result = await client.postJson('/actions/admin.logs.tail', {
         // A filter needs the wider window to have anything to find; without
-        // one there is no reason to fetch more than is shown.
-        {'lines': filtering ? _filterScanLines : lines},
-      );
+        // one there is no reason to fetch more than is shown. A range is
+        // read as asked either way.
+        'lines': filtering && !ranged ? _filterScanLines : lines,
+        if (from != null) 'from_line': from,
+        if (to != null) 'to_line': to,
+      });
       return mcpText(
-        logLinesToMarkdown(result, contains: contains, limit: lines),
+        logLinesToMarkdown(
+          result,
+          contains: contains,
+          // A range was sized by the caller; only a tail is cut to `lines`.
+          limit: ranged ? 500 : lines,
+        ),
       );
     },
   );
