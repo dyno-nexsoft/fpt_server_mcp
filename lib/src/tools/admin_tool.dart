@@ -5,6 +5,10 @@ import '../fpt_client.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
 
+/// How far back a `contains` filter looks — the most `admin.logs.tail` will
+/// return in one call.
+const _filterScanLines = 1000;
+
 /// Registers `admin.apiKeys.*`, `cron.run`, and `system.hotReload`/
 /// `system.restart` — the elevated-permission maintenance actions
 /// (`invoke`/`admin`/`invokeDangerous`).
@@ -86,19 +90,35 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         properties: {
           'lines': Schema.int(
             minimum: 1,
-            maximum: 1000,
-            description:
-                'How many trailing lines to read (default 200, max 1000)',
+            maximum: 500,
+            description: 'How many of the newest lines to return '
+                '(default 100, max 500). The reply is also capped at about '
+                '12k characters, dropping the oldest lines first.',
+          ),
+          'contains': Schema.string(
+            description: 'Only lines containing this text (case-insensitive), '
+                'searched across the last $_filterScanLines lines of the '
+                'log. Most of the log is one audit line per dashboard poll, '
+                'so filtering (e.g. "SEVERE", "review", an error message) is '
+                'usually the way to find what you want.',
           ),
         },
       ),
     ),
     (request) async {
+      final args = request.arguments ?? const {};
+      final lines = ((args['lines'] as num?)?.toInt() ?? 100).clamp(1, 500);
+      final contains = (args['contains'] as String?)?.trim();
+      final filtering = contains != null && contains.isNotEmpty;
       final result = await client.postJson(
         '/actions/admin.logs.tail',
-        request.arguments ?? const {},
+        // A filter needs the wider window to have anything to find; without
+        // one there is no reason to fetch more than is shown.
+        {'lines': filtering ? _filterScanLines : lines},
       );
-      return mcpText(logLinesToMarkdown(result));
+      return mcpText(
+        logLinesToMarkdown(result, contains: contains, limit: lines),
+      );
     },
   );
 

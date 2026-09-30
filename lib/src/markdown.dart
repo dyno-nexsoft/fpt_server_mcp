@@ -85,14 +85,60 @@ String apiKeyCreatedToMarkdown(Map<String, dynamic> json) {
   ].join('\n\n');
 }
 
-/// `admin.logs.tail`: the lines as a code block, ready to read or paste.
-String logLinesToMarkdown(Map<String, dynamic> json) {
-  final lines = [
+/// What a log read may put in front of the reader, in characters — about 4k
+/// tokens. `server.log` is mostly one audit line per dashboard poll, and an
+/// unbounded tail of it overflowed the tool-result limit before the
+/// interesting lines were even reached.
+const logTailMaxChars = 12000;
+
+/// `admin.logs.tail`: the newest lines as a code block, ready to read or
+/// paste.
+///
+/// [contains] keeps only the lines holding that text (case-insensitive) —
+/// the way to find one thing in a log that is mostly polling — and [limit]
+/// then caps how many of the newest remain. Whatever is still over
+/// [maxChars] loses its *oldest* lines, with a note saying how many, so the
+/// reader knows the top of the block is not the start of the log.
+String logLinesToMarkdown(
+  Map<String, dynamic> json, {
+  String? contains,
+  int limit = 100,
+  int maxChars = logTailMaxChars,
+}) {
+  final needle = contains?.trim().toLowerCase();
+  var lines = [
     for (final line in json['lines'] as List<dynamic>? ?? const [])
-      if ('$line'.isNotEmpty) '$line',
+      if ('$line'.isNotEmpty &&
+          (needle == null ||
+              needle.isEmpty ||
+              '$line'.toLowerCase().contains(needle)))
+        '$line',
   ];
-  if (lines.isEmpty) return '_The log is empty._';
-  return _codeBlock(lines);
+  if (lines.isEmpty) {
+    return needle == null || needle.isEmpty
+        ? '_The log is empty._'
+        : '_No recent log line contains `$contains`._';
+  }
+  if (lines.length > limit) lines = lines.sublist(lines.length - limit);
+
+  var total = 0;
+  var keepFrom = lines.length;
+  while (keepFrom > 0 && total + lines[keepFrom - 1].length + 1 <= maxChars) {
+    keepFrom--;
+    total += lines[keepFrom].length + 1;
+  }
+  // A single line longer than the whole budget still shows, cut short,
+  // rather than an empty block.
+  if (keepFrom == lines.length) {
+    final last = lines.last;
+    return _codeBlock([last.substring(0, maxChars)]);
+  }
+  final cut = keepFrom;
+  final block = _codeBlock(lines.sublist(keepFrom));
+  return cut == 0
+      ? block
+      : '_$cut older line(s) left out to stay under $maxChars characters — '
+          'ask for fewer `lines` or filter with `contains`._\n\n$block';
 }
 
 /// A tool failure as one short Markdown message, in place of the raw exception

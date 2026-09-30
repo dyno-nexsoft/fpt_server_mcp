@@ -118,6 +118,44 @@ void main() {
     test('an empty log', () {
       expect(logLinesToMarkdown({'lines': []}), '_The log is empty._');
     });
+
+    test('only the newest `limit` lines are kept', () {
+      final out = logLinesToMarkdown({
+        'lines': ['1', '2', '3', '4'],
+      }, limit: 2);
+      expect(out, '```\n3\n4\n```');
+    });
+
+    test('`contains` filters case-insensitively before the limit applies', () {
+      final out = logLinesToMarkdown({
+        'lines': ['poll', 'SEVERE one', 'poll', 'poll', 'severe two', 'poll'],
+      }, contains: 'Severe', limit: 1);
+      expect(out, '```\nsevere two\n```');
+    });
+
+    test('a filter that matches nothing says so', () {
+      expect(
+        logLinesToMarkdown({
+          'lines': ['a'],
+        }, contains: 'zzz'),
+        '_No recent log line contains `zzz`._',
+      );
+    });
+
+    test('over the character budget the oldest lines go, with a note', () {
+      final lines = [for (var i = 0; i < 10; i++) 'line-$i'.padRight(20, '.')];
+      final out = logLinesToMarkdown({'lines': lines}, maxChars: 65);
+      expect(out, startsWith('_7 older line(s) left out'));
+      expect(out, contains('line-9'));
+      expect(out, isNot(contains('line-6')));
+    });
+
+    test('one line bigger than the whole budget is cut, not dropped', () {
+      final out = logLinesToMarkdown({
+        'lines': ['x' * 50],
+      }, maxChars: 10);
+      expect(out, '```\n${'x' * 10}\n```');
+    });
   });
 
   group('errorToMarkdown', () {
