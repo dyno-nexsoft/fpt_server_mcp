@@ -1,4 +1,5 @@
 import 'package:dart_mcp/server.dart';
+import 'package:fpt_server_shared/fpt_server_shared.dart';
 import '../server.dart';
 
 import '../fpt_client.dart';
@@ -127,14 +128,20 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       final contains = (args['contains'] as String?)?.trim();
       final filtering = contains != null && contains.isNotEmpty;
       final ranged = from != null || to != null;
-      final result = await client.postJson('/actions/admin.logs.tail', {
+      // The shared params class spells the keys, so this cannot drift from
+      // what the server reads.
+      final params = LogsTailParams(
         // A filter needs the wider window to have anything to find; without
         // one there is no reason to fetch more than is shown. A range is
         // read as asked either way.
-        'lines': filtering && !ranged ? _filterScanLines : lines,
-        if (from != null) 'from_line': from,
-        if (to != null) 'to_line': to,
-      });
+        lines: filtering && !ranged ? _filterScanLines : lines,
+        fromLine: from,
+        toLine: to,
+      );
+      final result = await client.postJson(
+        '/actions/admin.logs.tail',
+        params.toJson(),
+      );
       return mcpText(
         logLinesToMarkdown(
           result,
@@ -204,10 +211,13 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final whenIdle = request.arguments?['when_idle'] as bool?;
-      final result = await client.postJson('/actions/system.restart', {
-        if (whenIdle != null) 'when_idle': whenIdle,
-      });
+      final params = RestartParams(
+        whenIdle: request.arguments?['when_idle'] as bool? ?? false,
+      );
+      final result = await client.postJson(
+        '/actions/system.restart',
+        params.toJson(),
+      );
       return mcpText(resultToMarkdown(result));
     },
   );
