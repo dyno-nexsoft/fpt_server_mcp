@@ -38,6 +38,14 @@ that implementation.
 | `fpt_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
 | `fpt_hot_reload`              | Pull latest code and hot reload, no restart (`admin` scope)  |
 | `fpt_restart`                 | Pull latest code and restart the process (`admin` scope)     |
+| `fpt_schedule_get`            | Working calendar, days off and every scheduled job with its next run |
+| `fpt_schedule_set_weekday`    | Make a weekday a working day or not, and set its hours (`admin` scope) |
+| `fpt_schedule_add_exception`  | Declare a day off or a make-up working day on a date (`admin` scope) |
+| `fpt_schedule_remove_exception` | Remove a day off or make-up day (`admin` scope)            |
+| `fpt_schedule_set_job`        | Switch a job on/off, move it, or add a spoken announcement (`admin` scope) |
+| `fpt_schedule_remove_job`     | Delete a spoken announcement (`admin` scope)                 |
+| `fpt_limits_get` / `fpt_limits_set` | Show / change the admin limits: retention, timeouts, AI settings |
+| `fpt_prompts_get` / `fpt_prompts_set` | Show / change the project parts of the AI prompts        |
 | `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
 
 **Design notes:**
@@ -159,5 +167,6 @@ lib/src/
     ├── build_tool.dart        # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
     ├── zentao_tool.dart       # fpt_zentao_report_*
     ├── admin_tool.dart        # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
+    ├── config_tool.dart       # fpt_schedule_* · fpt_limits_* · fpt_prompts_* (read-modify-write over schedule.*, limits.*, prompts.*)
     └── action_tool.dart       # fpt_invoke_action
 ```
