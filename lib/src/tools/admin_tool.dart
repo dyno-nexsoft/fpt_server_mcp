@@ -1,10 +1,10 @@
 import 'package:dart_mcp/server.dart';
 import 'package:fpt_server_shared/fpt_server_shared.dart';
-import '../server.dart';
 
 import '../fpt_client.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
+import '../server.dart';
 
 /// How far back a `contains` filter looks — the most `admin.logs.tail` will
 /// return in one call.

@@ -1,10 +1,10 @@
 import 'package:dart_mcp/server.dart';
-import '../server.dart';
 import 'package:fpt_server_shared/fpt_server_shared.dart';
 
 import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
+import '../server.dart';
 
 String _paramsToMarkdown(List<ActionParam> params) {
   if (params.isEmpty) return '_No parameters._';

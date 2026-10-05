@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import '../server.dart';
 
 import '../fpt_client.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
+import '../server.dart';
 
 /// Registers the `zentao.report.*`/`zentao.unlink` tools. Every one of these
 /// requires the caller's Discord account to already be linked to a Zentao

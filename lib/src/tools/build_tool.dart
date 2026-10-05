@@ -1,10 +1,10 @@
 import 'package:dart_mcp/server.dart';
-import '../server.dart';
 import 'package:fpt_server_shared/fpt_server_shared.dart';
 
 import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
+import '../server.dart';
 
 // Sourced from the shared enums themselves rather than hand-copied lists —
 // the same class of drift hard constraint #4 warns about: `_buildPlatforms`
