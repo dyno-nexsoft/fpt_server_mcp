@@ -364,74 +364,58 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
     },
   );
 
-  // ---- prompts ----------------------------------------------------------
+  // ---- AI provider ------------------------------------------------------
+
+  String providerToMarkdown(AiProviderInfo info) =>
+      '- **Active provider**: `${info.provider}`\n'
+      '- **Available** (have API keys): ${info.available.map((p) => '`$p`').join(', ')}\n'
+      '- **Failover to the other provider**: ${info.failover ? 'on' : 'off'}';
 
   server.registerTool(
     Tool(
-      name: 'fpt_prompts_get',
+      name: 'fpt_ai_provider_get',
       description:
-          'Show the editable parts of the AI review and translation prompts '
-          '(review_intro, review_conventions, translator_intro) and the '
-          'built-in text they reset to (prompts.get).',
+          'Show which AI provider (gemini or groq) serves reviews, translations '
+          'and announcements, which have API keys, and whether the other takes '
+          'over when the active one is down (admin.aiProvider.get).',
       inputSchema: Schema.object(),
     ),
-    (request) async {
-      final info = await api.promptsGet();
-      final p = info.prompts.toJson();
-      final d = info.defaults.toJson();
-      return mcpText([
-        for (final key in p.keys)
-          '**$key**${p[key] == d[key] ? ' _(built-in)_' : ' _(edited)_'}\n\n'
-              '```\n${p[key]}\n```',
-      ].join('\n\n'));
-    },
+    (request) async => mcpText(providerToMarkdown(await api.aiProviderGet())),
   );
 
   server.registerTool(
     Tool(
-      name: 'fpt_prompts_set',
+      name: 'fpt_ai_provider_set',
       description:
-          'Change the project parts of the AI prompts; the fields you name '
-          'change and the rest keep their text. Applies to the next review or '
-          'translation (prompts.set). Admin. Use fpt_prompts_get first to see '
-          'the current text; to reset a field, pass the built-in text.',
+          'Select the AI provider and/or turn failover on or off. The provider '
+          'must have an API key configured. Applies to the next request, no '
+          'restart (admin.aiProvider.set). Admin.',
       inputSchema: Schema.object(
         properties: {
-          'review_intro': Schema.string(
-            description: 'Who the reviewer is and what the project is',
-          ),
-          'review_conventions': Schema.string(
-            description: 'The conventions the review checks, a Markdown list',
-          ),
-          'translator_intro': Schema.string(
-            description: 'What app the translated strings are for',
+          'provider': Schema.string(description: 'gemini or groq'),
+          'failover': Schema.bool(
+            description: 'Try the other provider when the active one is down',
           ),
         },
       ),
     ),
     (request) async {
-      final named = <String, Object?>{
-        for (final key in const [
-          'review_intro',
-          'review_conventions',
-          'translator_intro',
-        ])
-          if (_string(request.arguments, key) case final value?) key: value,
-      };
-      if (named.isEmpty) {
+      final provider = _string(request.arguments, 'provider');
+      final failover = _bool(request.arguments, 'failover');
+      if (provider == null && failover == null) {
         throw FptRequestError(
-            400, 'config.invalid_edit', 'Name at least one prompt field.');
+          400,
+          'config.invalid_edit',
+          'Give a provider, failover, or both.',
+        );
       }
-      final current = (await api.promptsGet()).prompts;
-      final saved = await api.promptsSet(
-        AiPromptsSetParams(
-          prompts: AiPrompts.fromJson({...current.toJson(), ...named}),
-        ),
+      // The server takes the provider on every call; keep the current one when
+      // only failover is being changed.
+      final current = provider ?? (await api.aiProviderGet()).provider;
+      final saved = await api.aiProviderSet(
+        AiProviderSetParams(provider: current, failover: failover),
       );
-      return mcpText(
-        '✅ Saved ${named.keys.join(', ')}.\n\n'
-        '${saved.prompts.problems().isEmpty ? '' : 'Problems: ${saved.prompts.problems().join(' ')}'}',
-      );
+      return mcpText('✅ Saved.\n\n${providerToMarkdown(saved)}');
     },
   );
 }

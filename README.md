@@ -45,7 +45,7 @@ that implementation.
 | `fpt_schedule_set_job`        | Switch a job on/off, move it, or add a spoken announcement (`admin` scope) |
 | `fpt_schedule_remove_job`     | Delete a spoken announcement (`admin` scope)                 |
 | `fpt_limits_get` / `fpt_limits_set` | Show / change the admin limits: retention, timeouts, AI settings |
-| `fpt_prompts_get` / `fpt_prompts_set` | Show / change the project parts of the AI prompts        |
+| `fpt_ai_provider_get` / `fpt_ai_provider_set` | Show / select the AI provider (Gemini or Groq) and failover |
 | `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
 
 **Design notes:**
@@ -167,6 +167,6 @@ lib/src/
     ├── build_tool.dart        # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
     ├── zentao_tool.dart       # fpt_zentao_report_*
     ├── admin_tool.dart        # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
-    ├── config_tool.dart       # fpt_schedule_* · fpt_limits_* · fpt_prompts_* (read-modify-write over schedule.*, limits.*, prompts.*)
+    ├── config_tool.dart       # fpt_schedule_* · fpt_limits_* (read-modify-write over schedule.* and limits.*)
     └── action_tool.dart       # fpt_invoke_action
 ```
