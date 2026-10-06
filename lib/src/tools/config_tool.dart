@@ -369,7 +369,10 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
   String providerToMarkdown(AiProviderInfo info) =>
       '- **Active provider**: `${info.provider}`\n'
       '- **Available** (have API keys): ${info.available.map((p) => '`$p`').join(', ')}\n'
-      '- **Failover to the other provider**: ${info.failover ? 'on' : 'off'}';
+      '- **Failover to the other provider**: ${info.failover ? 'on' : 'off'}\n'
+      '- **Models** (Flash / Pro): '
+      'gemini `${info.models.geminiFlash}` / `${info.models.geminiPro}`, '
+      'groq `${info.models.groqFlash}` / `${info.models.groqPro}`';
 
   server.registerTool(
     Tool(
@@ -387,33 +390,54 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
     Tool(
       name: 'fpt_ai_provider_set',
       description:
-          'Select the AI provider and/or turn failover on or off. The provider '
-          'must have an API key configured. Applies to the next request, no '
-          'restart (admin.aiProvider.set). Admin.',
+          'Select the AI provider, turn failover on or off, and/or set the model '
+          'id a provider uses for the flash or pro tier. The provider must '
+          'have an API key configured. Applies to the next request, no restart '
+          '(admin.aiProvider.set). Admin.',
       inputSchema: Schema.object(
         properties: {
           'provider': Schema.string(description: 'gemini or groq'),
           'failover': Schema.bool(
             description: 'Try the other provider when the active one is down',
           ),
+          'gemini_flash': Schema.string(description: 'Gemini model id, flash'),
+          'gemini_pro': Schema.string(description: 'Gemini model id, pro'),
+          'groq_flash': Schema.string(description: 'Groq model id, flash'),
+          'groq_pro': Schema.string(description: 'Groq model id, pro'),
         },
       ),
     ),
     (request) async {
       final provider = _string(request.arguments, 'provider');
       final failover = _bool(request.arguments, 'failover');
-      if (provider == null && failover == null) {
+      final geminiFlash = _string(request.arguments, 'gemini_flash');
+      final geminiPro = _string(request.arguments, 'gemini_pro');
+      final groqFlash = _string(request.arguments, 'groq_flash');
+      final groqPro = _string(request.arguments, 'groq_pro');
+      if (provider == null &&
+          failover == null &&
+          geminiFlash == null &&
+          geminiPro == null &&
+          groqFlash == null &&
+          groqPro == null) {
         throw FptRequestError(
           400,
           'config.invalid_edit',
-          'Give a provider, failover, or both.',
+          'Give a provider, failover, or a model id.',
         );
       }
       // The server takes the provider on every call; keep the current one when
       // only failover is being changed.
       final current = provider ?? (await api.aiProviderGet()).provider;
       final saved = await api.aiProviderSet(
-        AiProviderSetParams(provider: current, failover: failover),
+        AiProviderSetParams(
+          provider: current,
+          failover: failover,
+          geminiFlash: geminiFlash,
+          geminiPro: geminiPro,
+          groqFlash: groqFlash,
+          groqPro: groqPro,
+        ),
       );
       return mcpText('✅ Saved.\n\n${providerToMarkdown(saved)}');
     },
