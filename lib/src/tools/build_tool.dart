@@ -85,6 +85,35 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
+      name: 'fpt_ci_socialfi',
+      description:
+          'Repost TikTok videos to TBChat SocialFi (POST /socialfi, alias for '
+          'ci.socialfi). Returns a queued/running job.',
+      inputSchema: Schema.object(
+        properties: {
+          'url': Schema.string(description: 'TikTok video or profile link'),
+          'environment': UntitledSingleSelectEnumSchema(
+            values: _buildEnvironments,
+            description: 'Environment (default: dev)',
+          ),
+          'limit': Schema.int(
+            description: 'Most recent videos to take from a profile, 1-20 '
+                '(default 3)',
+          ),
+        },
+        required: ['url'],
+      ),
+    ),
+    (request) async {
+      final job = Job.fromJson(
+        await client.postJson('/socialfi', request.arguments ?? const {}),
+      );
+      return mcpText('### Socialfi queued\n\n${jobToMarkdown(job)}');
+    },
+  );
+
+  server.registerTool(
+    Tool(
       name: 'fpt_ci_replace',
       description: 'Replace the SDK inside tbchat (POST /replace, alias for '
           'ci.replace). Returns a queued/running job.',
