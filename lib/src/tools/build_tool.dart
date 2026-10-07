@@ -85,10 +85,10 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ci_socialfi',
+      name: 'fpt_ci_reposts',
       description:
-          'Repost TikTok videos to TBChat SocialFi (POST /socialfi, alias for '
-          'ci.socialfi). Returns a queued/running job.',
+          'Repost TikTok videos to TBChat SocialFi (POST /reposts, alias for '
+          'ci.reposts). Returns a queued/running job.',
       inputSchema: Schema.object(
         properties: {
           'url': Schema.string(description: 'TikTok video or profile link'),
@@ -106,9 +106,9 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final job = Job.fromJson(
-        await client.postJson('/socialfi', request.arguments ?? const {}),
+        await client.postJson('/reposts', request.arguments ?? const {}),
       );
-      return mcpText('### Socialfi queued\n\n${jobToMarkdown(job)}');
+      return mcpText('### Reposts queued\n\n${jobToMarkdown(job)}');
     },
   );
 
