@@ -87,11 +87,11 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
     Tool(
       name: 'fpt_ci_reposts',
       description:
-          'Repost TikTok videos to TBChat SocialFi (POST /reposts, alias for '
+          'Repost TikTok, YouTube, Facebook or Instagram videos to TBChat SocialFi (POST /reposts, alias for '
           'ci.reposts). Returns a queued/running job.',
       inputSchema: Schema.object(
         properties: {
-          'url': Schema.string(description: 'TikTok video or profile link'),
+          'url': Schema.string(description: 'TikTok, YouTube, Facebook or Instagram video or profile link'),
           'environment': UntitledSingleSelectEnumSchema(
             values: _buildEnvironments,
             description: 'Environment (default: dev)',
