@@ -1,19 +1,19 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import '../fpt_client.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 /// Registers the `zentao.report.*`/`zentao.unlink` tools. Every one of these
 /// requires the caller's Discord account to already be linked to a Zentao
 /// account — `zentao.link` itself is withheld from REST (needs a password,
 /// which can't travel through a JSON body).
-void registerZentaoTools(FptMcpServer server, FptClient client) {
+void registerZentaoTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_zentao_report_start',
+      name: 'nexsoft_zentao_report_start',
       description:
           "Create and start today's daily report task (zentao.report.start).",
       inputSchema: Schema.object(
@@ -34,7 +34,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_zentao_report_finish',
+      name: 'nexsoft_zentao_report_finish',
       description:
           "Mark today's daily report task as finished (zentao.report.finish).",
       inputSchema: Schema.object(
@@ -51,7 +51,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_zentao_report_close',
+      name: 'nexsoft_zentao_report_close',
       description: 'Close a completed daily report task (zentao.report.close).',
       inputSchema: Schema.object(
         properties: {'task_id': Schema.int(description: 'Zentao task id')},
@@ -67,7 +67,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_zentao_report_edit',
+      name: 'nexsoft_zentao_report_edit',
       description:
           'Edit the content of a daily report task (zentao.report.edit).',
       inputSchema: Schema.object(
@@ -91,7 +91,7 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_zentao_report_get',
+      name: 'nexsoft_zentao_report_get',
       description:
           'View full detail of a daily report task (zentao.report.get).',
       inputSchema: Schema.object(

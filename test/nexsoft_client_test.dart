@@ -1,15 +1,15 @@
 import 'dart:convert';
 
-import 'package:fpt_server_mcp/src/fpt_client.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:nexsoft_server_mcp/src/nexsoft_client.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('FptClient', () {
+  group('NexsoftClient', () {
     test('caches /actions GET responses but not other paths', () async {
       var getCount = 0;
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: '',
         client: MockClient((request) async {
@@ -33,7 +33,7 @@ void main() {
     test('post clears the cache so a subsequent GET refetches', () async {
       var actionsBody = 'a';
       var getCount = 0;
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: '',
         client: MockClient((request) async {
@@ -55,9 +55,9 @@ void main() {
     });
 
     test(
-        'wraps an error response into FptRequestError with the API code/message',
+        'wraps an error response into NexsoftRequestError with the API code/message',
         () async {
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: '',
         client: MockClient(
@@ -79,7 +79,7 @@ void main() {
       await expectLater(
         client.getJson('/jobs/x'),
         throwsA(
-          isA<FptRequestError>()
+          isA<NexsoftRequestError>()
               .having((e) => e.status, 'status', 409)
               .having((e) => e.code, 'code', 'job.already_finished')
               .having((e) => e.message, 'message', 'Build đã kết thúc'),
@@ -89,7 +89,7 @@ void main() {
 
     test('sends the API key as X-API-Key when configured', () async {
       String? seenHeader;
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: 'secret-key',
         client: MockClient((request) async {
@@ -104,7 +104,7 @@ void main() {
 
     test('invokeAction posts the params to /actions/<name>', () async {
       late http.Request sent;
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: '',
         client: MockClient((request) async {
@@ -123,7 +123,7 @@ void main() {
 
     test('invokeAction encodes a name that is not path-safe', () async {
       late Uri sent;
-      final client = FptClient(
+      final client = NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: '',
         client: MockClient((request) async {

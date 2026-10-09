@@ -1,4 +1,4 @@
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
 /// Renders a single job as compact Markdown instead of dumping raw JSON.
 String jobToMarkdown(Job job) {

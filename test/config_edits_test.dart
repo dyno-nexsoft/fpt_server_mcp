@@ -1,6 +1,6 @@
-import 'package:fpt_server_mcp/src/config_edits.dart' as edit;
-import 'package:fpt_server_mcp/src/fpt_client.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_mcp/src/config_edits.dart' as edit;
+import 'package:nexsoft_server_mcp/src/nexsoft_client.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 import 'package:test/test.dart';
 
 ScheduledJobConfig _system(String name, JobKind kind, JobTiming timing) =>
@@ -26,8 +26,8 @@ void main() {
       expect(edit.parseWeekday('1'), 1);
       expect(edit.parseWeekday('Sat'), 6);
       expect(edit.parseWeekday('sunday'), 7);
-      expect(() => edit.parseWeekday('8'), throwsA(isA<FptRequestError>()));
-      expect(() => edit.parseWeekday('x'), throwsA(isA<FptRequestError>()));
+      expect(() => edit.parseWeekday('8'), throwsA(isA<NexsoftRequestError>()));
+      expect(() => edit.parseWeekday('x'), throwsA(isA<NexsoftRequestError>()));
     });
   });
 
@@ -52,7 +52,7 @@ void main() {
       expect(none.ruleFor(1).hours.lunchStart, isNull);
       expect(
         () => edit.editWeekday(none, weekday: 1, lunchStart: '12:00'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
       final back = edit.editWeekday(
         none,
@@ -66,7 +66,7 @@ void main() {
     test('an invalid result is refused', () {
       expect(
         () => edit.editWeekday(standard, weekday: 1, start: '19:00'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
   });
@@ -100,11 +100,11 @@ void main() {
       expect(
         () => edit.addException(standard,
             date: '2026-10-05', working: false, end: '12:00'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
       expect(
         () => edit.addException(standard, date: 'soon', working: false),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
 
@@ -118,7 +118,7 @@ void main() {
       expect(edit.removeException(second, '2026-10-05').exceptions, isEmpty);
       expect(
         () => edit.removeException(standard, '2026-10-05'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
   });
@@ -152,7 +152,7 @@ void main() {
       expect(out.firstWhere((j) => j.name == 'Lunch').timing.offsetMinutes, 10);
       expect(
         () => edit.editJob(jobs, name: 'Cleanup', offsetMinutes: 10),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
 
@@ -160,7 +160,7 @@ void main() {
       expect(
         () => edit.editJob(jobs,
             name: 'Lunch', anchor: TimeAnchor.workEnd, time: '10:00'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
 
@@ -178,20 +178,21 @@ void main() {
       expect(out.last.kind, JobKind.announcement);
       expect(
         () => edit.editJob(jobs, name: 'Stretch', time: '10:00'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
 
     test('a built-in job has no prompt to set', () {
       expect(
         () => edit.editJob(jobs, name: 'Cleanup', prompt: 'x'),
-        throwsA(isA<FptRequestError>()),
+        throwsA(isA<NexsoftRequestError>()),
       );
     });
 
     test('anchor names', () {
       expect(edit.parseAnchor('lunch_end'), TimeAnchor.lunchEnd);
-      expect(() => edit.parseAnchor('noon'), throwsA(isA<FptRequestError>()));
+      expect(
+          () => edit.parseAnchor('noon'), throwsA(isA<NexsoftRequestError>()));
     });
   });
 
@@ -199,9 +200,9 @@ void main() {
     test('removes an announcement but not a built-in job', () {
       expect(edit.removeJob(jobs, 'Lunch'), hasLength(2));
       expect(() => edit.removeJob(jobs, 'Cleanup'),
-          throwsA(isA<FptRequestError>()));
-      expect(
-          () => edit.removeJob(jobs, 'Nope'), throwsA(isA<FptRequestError>()));
+          throwsA(isA<NexsoftRequestError>()));
+      expect(() => edit.removeJob(jobs, 'Nope'),
+          throwsA(isA<NexsoftRequestError>()));
     });
   });
 }

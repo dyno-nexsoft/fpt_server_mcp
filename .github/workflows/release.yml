@@ -16,7 +16,7 @@ jobs:
       - uses: dart-lang/setup-dart@v1
       - run: dart pub get
       - run: dart test
-      - run: dart compile exe bin/fpt_server_mcp.dart -o fpt_server_mcp
+      - run: dart compile exe bin/nexsoft_server_mcp.dart -o nexsoft_server_mcp
       - uses: softprops/action-gh-release@v2
         with:
-          files: fpt_server_mcp
+          files: nexsoft_server_mcp

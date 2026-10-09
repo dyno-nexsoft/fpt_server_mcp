@@ -1,10 +1,10 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart' as shared;
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart' as shared;
 
-import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 bool _looksLikeJob(Map<String, dynamic> data) =>
@@ -12,16 +12,16 @@ bool _looksLikeJob(Map<String, dynamic> data) =>
 
 /// Registers the generic dispatch tool that reaches every REST-exposed
 /// action by name, mirroring `POST /actions/{name}` directly. This is the
-/// fallback for anything not covered by a dedicated tool (fpt_ci_build,
-/// fpt_cancel_job, ...) — new server-side actions need no new tool here.
-/// Use `fpt_describe_action` first to see the param schema for a given name.
-void registerActionTools(FptMcpServer server, FptClient client) {
+/// fallback for anything not covered by a dedicated tool (nexsoft_ci_build,
+/// nexsoft_cancel_job, ...) — new server-side actions need no new tool here.
+/// Use `nexsoft_describe_action` first to see the param schema for a given name.
+void registerActionTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_invoke_action',
+      name: 'nexsoft_invoke_action',
       description:
           'Generic dispatch: invoke any REST-exposed action by name (see '
-          "fpt_list_actions / fpt_describe_action). Returns 202 with a job "
+          "nexsoft_list_actions / nexsoft_describe_action). Returns 202 with a job "
           "id for kind='job' actions, 200 with the result otherwise.",
       inputSchema: Schema.object(
         properties: {
@@ -29,7 +29,8 @@ void registerActionTools(FptMcpServer server, FptClient client) {
             description: "Action name, e.g. 'ci.build', 'ci.clean', 'cron.run'",
           ),
           'params': Schema.object(
-            description: 'Action-specific parameters, per fpt_describe_action',
+            description:
+                'Action-specific parameters, per nexsoft_describe_action',
           ),
         },
         required: ['name'],

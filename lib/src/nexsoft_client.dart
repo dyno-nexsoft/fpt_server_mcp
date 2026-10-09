@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fpt_server_shared/fpt_server_shared.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
 /// Thrown for any non-2xx response, carrying the REST API's own stable
-/// `error.code` — see `docs/rest-api.md#errors` in the fpt_server repo.
-class FptRequestError implements Exception {
-  FptRequestError(this.status, this.code, this.message);
+/// `error.code` — see `docs/rest-api.md#errors` in the nexsoft_server repo.
+class NexsoftRequestError implements Exception {
+  NexsoftRequestError(this.status, this.code, this.message);
 
   final int status;
   final String code;
@@ -28,7 +28,7 @@ class HttpResult {
   final Map<String, String> headers;
 }
 
-/// Client for the fpt_server REST API (`docs/rest-api.md`).
+/// Client for the nexsoft_server REST API (`docs/rest-api.md`).
 ///
 /// Unlike a Discord-facing surface there is no login step — auth is a
 /// static API key sent as `X-API-Key` on every request. GET responses are
@@ -36,20 +36,21 @@ class HttpResult {
 /// endpoints are always fetched fresh since callers rely on them for
 /// near-real-time state.
 ///
-/// It is also the [ActionTransport] the typed `FptActions` calls run over, so
+/// It is also the [ActionTransport] the typed `NexsoftActions` calls run over, so
 /// a tool never spells an action name or a parameter key itself.
-class FptClient implements ActionTransport {
-  factory FptClient({http.Client? client, String? baseUrl, String? apiKey}) {
+class NexsoftClient implements ActionTransport {
+  factory NexsoftClient(
+      {http.Client? client, String? baseUrl, String? apiKey}) {
     final resolvedBaseUrl =
-        baseUrl ?? Platform.environment['FPT_SERVER_BASE_URL'] ?? '';
-    return FptClient._(
+        baseUrl ?? Platform.environment['NEXSOFT_SERVER_BASE_URL'] ?? '';
+    return NexsoftClient._(
       client: client ?? _trustingClient(resolvedBaseUrl),
       baseUrl: resolvedBaseUrl,
-      apiKey: apiKey ?? Platform.environment['FPT_SERVER_API_KEY'] ?? '',
+      apiKey: apiKey ?? Platform.environment['NEXSOFT_SERVER_API_KEY'] ?? '',
     );
   }
 
-  FptClient._({
+  NexsoftClient._({
     required http.Client client,
     required this.baseUrl,
     required String apiKey,
@@ -60,7 +61,7 @@ class FptClient implements ActionTransport {
   final String baseUrl;
   final String _apiKey;
 
-  /// fpt_server serves a self-signed certificate over LAN (no public CA can
+  /// nexsoft_server serves a self-signed certificate over LAN (no public CA can
   /// issue one for a `.local` hostname). Trusting it blanket-wide would
   /// silently accept a cert from anywhere; scoping the callback to the exact
   /// configured host keeps the bypass limited to the one server this client
@@ -159,7 +160,7 @@ class FptClient implements ActionTransport {
       // generic status-based message rather than failing to report the
       // original error at all.
     }
-    throw FptRequestError(response.statusCode, code, message);
+    throw NexsoftRequestError(response.statusCode, code, message);
   }
 
   void close() => _client.close();

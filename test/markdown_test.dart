@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:fpt_server_mcp/src/fpt_client.dart';
-import 'package:fpt_server_mcp/src/markdown.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
 import 'package:http/http.dart' as http;
+import 'package:nexsoft_server_mcp/src/markdown.dart';
+import 'package:nexsoft_server_mcp/src/nexsoft_client.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -193,7 +193,8 @@ void main() {
   group('errorToMarkdown', () {
     test('an API error names its status and code', () {
       expect(
-        errorToMarkdown(FptRequestError(409, 'job.finished', 'Already done')),
+        errorToMarkdown(
+            NexsoftRequestError(409, 'job.finished', 'Already done')),
         '**Request failed** (409 `job.finished`): Already done',
       );
     });
@@ -204,7 +205,7 @@ void main() {
           'SocketException: The remote computer refused the connection',
         ),
       );
-      expect(out, startsWith('**Cannot reach the fpt_server API.**'));
+      expect(out, startsWith('**Cannot reach the nexsoft_server API.**'));
       expect(out, isNot(contains('#0')));
       expect(
         errorToMarkdown(const SocketException('refused')),

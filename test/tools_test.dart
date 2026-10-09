@@ -2,27 +2,27 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:dart_mcp/client.dart';
-import 'package:fpt_server_mcp/src/fpt_client.dart';
-import 'package:fpt_server_mcp/src/server.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:nexsoft_server_mcp/src/nexsoft_client.dart';
+import 'package:nexsoft_server_mcp/src/server.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:test/test.dart';
 
-/// One request the fake fpt_server received: the path it hit and the JSON
+/// One request the fake nexsoft_server received: the path it hit and the JSON
 /// body it was sent.
 typedef _Sent = ({String path, Map<String, dynamic> body});
 
-/// A real [FptMcpServer] over an in-memory channel, talking to a fake REST
+/// A real [NexsoftMcpServer] over an in-memory channel, talking to a fake REST
 /// backend — so a test sees exactly what a tool call puts on the wire and
 /// what the caller reads back, with nothing mocked in between.
 class _Harness {
   _Harness(this._reply) {
     final toServer = StreamController<String>();
     final toClient = StreamController<String>();
-    server = FptMcpServer(
+    server = NexsoftMcpServer(
       StreamChannel.withCloseGuarantee(toServer.stream, toClient.sink),
-      client: FptClient(
+      client: NexsoftClient(
         baseUrl: 'https://example.test',
         apiKey: 'k',
         client: MockClient((request) async {
@@ -48,7 +48,7 @@ class _Harness {
 
   final (int, Map<String, Object?>) Function(String path) _reply;
   final _client = MCPClient(Implementation(name: 'test', version: '0.0.0'));
-  late final FptMcpServer server;
+  late final NexsoftMcpServer server;
   late final ServerConnection connection;
   final sent = <_Sent>[];
 
@@ -89,7 +89,8 @@ void main() {
   group('zentao tools', () {
     test('finish sends the typed task id and shows the message', () async {
       final h = await _start((_) => (200, {'message': '✅ Finished'}));
-      final result = await h.call('fpt_zentao_report_finish', {'task_id': 7});
+      final result =
+          await h.call('nexsoft_zentao_report_finish', {'task_id': 7});
 
       expect(h.sent.single.path, '/actions/zentao.report.finish');
       expect(h.sent.single.body, {'task_id': 7});
@@ -101,7 +102,7 @@ void main() {
       final h = await _start(
         (_) => (200, {'task_id': 42, 'message': 'Started'}),
       );
-      final result = await h.call('fpt_zentao_report_start', {
+      final result = await h.call('nexsoft_zentao_report_start', {
         'description': '- did things',
       });
 
@@ -113,7 +114,7 @@ void main() {
 
     test('edit sends both the task id and the new text', () async {
       final h = await _start((_) => (200, {'message': 'Saved'}));
-      await h.call('fpt_zentao_report_edit', {
+      await h.call('nexsoft_zentao_report_edit', {
         'task_id': 3,
         'description': 'new',
       });
@@ -137,7 +138,7 @@ void main() {
           },
         ),
       );
-      final result = await h.call('fpt_zentao_report_get', {'task_id': 9});
+      final result = await h.call('nexsoft_zentao_report_get', {'task_id': 9});
 
       expect(h.sent.single.body, {'task_id': 9});
       final text = _text(result);
@@ -165,7 +166,7 @@ void main() {
           },
         ),
       );
-      final result = await h.call('fpt_admin_apikeys_list');
+      final result = await h.call('nexsoft_admin_apikeys_list');
 
       expect(h.sent.single.path, '/actions/admin.apiKeys.list');
       expect(_text(result), contains('| Me _(this key)_ | `k1` | admin |'));
@@ -185,7 +186,7 @@ void main() {
           },
         ),
       );
-      final result = await h.call('fpt_admin_apikeys_add', {'name': 'CI'});
+      final result = await h.call('nexsoft_admin_apikeys_add', {'name': 'CI'});
 
       expect(h.sent.single.path, '/actions/admin.apiKeys.add');
       expect(h.sent.single.body, {'name': 'CI'});
@@ -195,7 +196,7 @@ void main() {
 
     test('apikeys remove sends the id', () async {
       final h = await _start((_) => (200, {'message': 'Deleted'}));
-      final result = await h.call('fpt_admin_apikeys_remove', {'id': 'k1'});
+      final result = await h.call('nexsoft_admin_apikeys_remove', {'id': 'k1'});
 
       expect(h.sent.single.path, '/actions/admin.apiKeys.remove');
       expect(h.sent.single.body, {'id': 'k1'});
@@ -204,7 +205,7 @@ void main() {
 
     test('cron run sends the job name', () async {
       final h = await _start((_) => (200, {'message': 'Ran'}));
-      await h.call('fpt_cron_run', {'job': 'cleanup'});
+      await h.call('nexsoft_cron_run', {'job': 'cleanup'});
 
       expect(h.sent.single.path, '/actions/cron.run');
       expect(h.sent.single.body, {'job': 'cleanup'});
@@ -212,7 +213,7 @@ void main() {
 
     test('hot reload posts with no params', () async {
       final h = await _start((_) => (200, {'message': 'Reloaded'}));
-      final result = await h.call('fpt_hot_reload');
+      final result = await h.call('nexsoft_hot_reload');
 
       expect(h.sent.single.path, '/actions/system.hotReload');
       expect(h.sent.single.body, isEmpty);
@@ -221,8 +222,8 @@ void main() {
 
     test('restart passes when_idle through, false by default', () async {
       final h = await _start((_) => (200, {'message': 'Restarting'}));
-      await h.call('fpt_restart', {'when_idle': true});
-      await h.call('fpt_restart');
+      await h.call('nexsoft_restart', {'when_idle': true});
+      await h.call('nexsoft_restart');
 
       expect(
           h.sent.map((s) => s.path), everyElement('/actions/system.restart'));
@@ -241,7 +242,7 @@ void main() {
           },
         ),
       );
-      final result = await h.call('fpt_admin_logs_tail', {
+      final result = await h.call('nexsoft_admin_logs_tail', {
         'contains': 'severe',
         'lines': 5,
       });
@@ -266,7 +267,7 @@ void main() {
         },
       ),
     );
-    await h.call('fpt_ci_build', {
+    await h.call('nexsoft_ci_build', {
       'tbchat': 'dev',
       'database': 'dev',
       'build_name': '1.4.2',
@@ -285,7 +286,7 @@ void main() {
 
   test('logs tail passes the log source through', () async {
     final h = await _start((_) => (200, {'lines': <String>[]}));
-    await h.call('fpt_admin_logs_tail', {'source': 'novnc'});
+    await h.call('nexsoft_admin_logs_tail', {'source': 'novnc'});
 
     expect(h.sent.single.body['source'], 'novnc');
   });
@@ -299,7 +300,7 @@ void main() {
         },
       ),
     );
-    final result = await h.call('fpt_hot_reload');
+    final result = await h.call('nexsoft_hot_reload');
 
     expect(result.isError, isTrue);
     expect(_text(result), contains('Admin only'));

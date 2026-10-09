@@ -1,17 +1,17 @@
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import 'fpt_client.dart';
+import 'nexsoft_client.dart';
 
 /// Pure edits to the working calendar and the scheduled jobs: each takes the
 /// document as the server has it and returns the changed one, so a tool can
 /// change one thing without the caller assembling — or getting wrong — the
 /// whole document `schedule.set` takes.
 ///
-/// A bad edit throws a [FptRequestError] saying what is wrong, which the tool
+/// A bad edit throws a [NexsoftRequestError] saying what is wrong, which the tool
 /// guard renders like any other failed request.
 
 Never _refuse(String message) =>
-    throw FptRequestError(400, 'config.invalid_edit', message);
+    throw NexsoftRequestError(400, 'config.invalid_edit', message);
 
 const _weekdayNames = [
   'monday',

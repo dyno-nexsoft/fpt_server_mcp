@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import '../fpt_client.dart';
 import '../markdown.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 /// How far back a `contains` filter looks — the most `admin.logs.tail` will
@@ -22,10 +22,10 @@ const _filterScanLines = 1000;
 /// `system.restart` runs `git pull` then reloads the process, so a leaked
 /// key is remote code execution on the build machine, not just an unwanted
 /// restart.
-void registerAdminTools(FptMcpServer server, FptClient client) {
+void registerAdminTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_admin_apikeys_list',
+      name: 'nexsoft_admin_apikeys_list',
       description:
           'List your API keys — an owner sees every key (admin.apiKeys.list).',
       inputSchema: Schema.object(),
@@ -37,7 +37,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_admin_apikeys_add',
+      name: 'nexsoft_admin_apikeys_add',
       description: 'Create a new API key for yourself (admin.apiKeys.add). The '
           'response includes `secret`, shown exactly once — only its hash '
           'is persisted server-side.',
@@ -63,7 +63,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_admin_apikeys_remove',
+      name: 'nexsoft_admin_apikeys_remove',
       description: 'Delete one of your API keys — an owner can delete any key '
           '(admin.apiKeys.remove).',
       inputSchema: Schema.object(
@@ -83,7 +83,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_admin_logs_tail',
+      name: 'nexsoft_admin_logs_tail',
       description: 'Read server.log for debugging (admin.logs.tail). '
           'Admin-only — the log records every request URL and is not '
           'otherwise reachable. By default the newest lines; every reply '
@@ -161,12 +161,12 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_cron_run',
+      name: 'nexsoft_cron_run',
       description:
           'Run a scheduled job immediately (cron.run). Cron jobs clean '
           'caches, restart the process, and post to shared channels — '
           'requires invokeDangerous. The valid job names are whatever '
-          'fpt_server currently has scheduled; an unknown name comes back '
+          'nexsoft_server currently has scheduled; an unknown name comes back '
           'as an error naming the live set, so there is no fixed list to '
           'remember here.',
       inputSchema: Schema.object(
@@ -186,7 +186,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_hot_reload',
+      name: 'nexsoft_hot_reload',
       description: 'Pull the latest code and hot reload without restarting the '
           'process (system.hotReload). Admin-only.',
       inputSchema: Schema.object(),
@@ -199,7 +199,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_restart',
+      name: 'nexsoft_restart',
       description:
           'Pull the latest code, install dependencies, and restart the bot '
           'process (system.restart). Admin-only — the bot is briefly '

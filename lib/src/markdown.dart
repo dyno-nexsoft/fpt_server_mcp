@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:fpt_server_shared/fpt_server_shared.dart';
 import 'package:http/http.dart' as http;
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import 'fpt_client.dart';
+import 'nexsoft_client.dart';
 
 /// Renders an action's JSON result as Markdown a person (or a model) can read
 /// at a glance, instead of pretty-printed JSON.
@@ -163,11 +163,11 @@ String logLinesToMarkdown(
 /// A tool failure as one short Markdown message, in place of the raw exception
 /// and stack trace an uncaught error would put in front of the reader.
 String errorToMarkdown(Object error) => switch (error) {
-      FptRequestError(:final status, :final code, :final message) =>
+      NexsoftRequestError(:final status, :final code, :final message) =>
         '**Request failed** ($status `$code`): $message',
       http.ClientException() ||
       SocketException() =>
-        '**Cannot reach the fpt_server API.** It may be restarting — try again in '
+        '**Cannot reach the nexsoft_server API.** It may be restarting — try again in '
             'a moment.\n\n_${_firstLine('$error')}_',
       _ => '**Unexpected error**: ${_firstLine('$error')}',
     };

@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
 import '../config_edits.dart' as edit;
-import '../fpt_client.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 String? _string(Map<String, Object?>? args, String key) {
@@ -69,7 +69,7 @@ String scheduleToMarkdown(ScheduleInfo info) {
 /// Each edit reads the document, changes the one thing asked for and sends it
 /// back, so a caller says "make 2 Jan a day off" rather than assembling the
 /// whole calendar `schedule.set` takes. The server still validates everything.
-void registerConfigTools(FptMcpServer server, FptClient client) {
+void registerConfigTools(NexsoftMcpServer server, NexsoftClient client) {
   Future<CallToolResult> saveSchedule(
     ScheduleInfo current, {
     WorkCalendar? calendar,
@@ -88,7 +88,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_get',
+      name: 'nexsoft_schedule_get',
       description:
           'Show the working calendar (which weekdays are worked and their '
           'hours), the days off and make-up days, and every scheduled job '
@@ -100,7 +100,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_set_weekday',
+      name: 'nexsoft_schedule_set_weekday',
       description:
           'Change one weekday of the working calendar: whether it is worked '
           'and/or its hours. Only what you give changes. Admin. Times are '
@@ -141,7 +141,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_add_exception',
+      name: 'nexsoft_schedule_add_exception',
       description:
           'Declare a day off (a holiday, working=false) or a make-up working '
           'day (working=true) on a date, replacing any already there. A '
@@ -185,7 +185,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_remove_exception',
+      name: 'nexsoft_schedule_remove_exception',
       description: 'Remove the day off or make-up day on a date. Admin.',
       inputSchema: Schema.object(
         properties: {'date': Schema.string(description: 'yyyy-MM-dd')},
@@ -206,7 +206,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_set_job',
+      name: 'nexsoft_schedule_set_job',
       description:
           'Change a scheduled job — switch it on or off, move it — or add a '
           'spoken announcement (a new name needs timing, prompt and '
@@ -262,10 +262,10 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_schedule_remove_job',
+      name: 'nexsoft_schedule_remove_job',
       description:
           'Delete a spoken announcement. The built-in jobs cannot be deleted, '
-          'only switched off with fpt_schedule_set_job enabled=false. Admin.',
+          'only switched off with nexsoft_schedule_set_job enabled=false. Admin.',
       inputSchema: Schema.object(
         properties: {'name': Schema.string(description: 'Announcement name')},
         required: ['name'],
@@ -298,7 +298,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_limits_get',
+      name: 'nexsoft_limits_get',
       description:
           'Show the limits an admin can change — history retention, build '
           'timeout, daily-report sweep, review and AI settings — with the '
@@ -311,11 +311,11 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_limits_set',
+      name: 'nexsoft_limits_set',
       description:
           'Change one or more limits; the ones you name change and the rest '
           'keep their value. Applies from the next use, no restart '
-          '(limits.set). Admin. See fpt_limits_get for names and ranges.',
+          '(limits.set). Admin. See nexsoft_limits_get for names and ranges.',
       inputSchema: Schema.object(
         properties: {
           for (final key in AppLimits.ranges.keys)
@@ -333,7 +333,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
             key: (request.arguments![key] as num).toInt(),
       };
       if (named.isEmpty) {
-        throw FptRequestError(
+        throw NexsoftRequestError(
             400, 'config.invalid_edit', 'Name at least one limit.');
       }
       final saved = await client.limitsSet(
@@ -360,7 +360,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ai_provider_get',
+      name: 'nexsoft_ai_provider_get',
       description:
           'Show which AI provider (gemini or groq) serves reviews, translations '
           'and announcements, which have API keys, and whether the other takes '
@@ -373,7 +373,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ai_provider_set',
+      name: 'nexsoft_ai_provider_set',
       description:
           'Select the AI provider, turn failover on or off, and/or set the model '
           'id a provider uses for the flash or pro tier. The provider must '
@@ -405,7 +405,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
           geminiPro == null &&
           groqFlash == null &&
           groqPro == null) {
-        throw FptRequestError(
+        throw NexsoftRequestError(
           400,
           'config.invalid_edit',
           'Give a provider, failover, or a model id.',

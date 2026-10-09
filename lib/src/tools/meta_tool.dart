@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 String _paramsToMarkdown(List<ActionParam> params) {
@@ -20,12 +20,12 @@ String _paramsToMarkdown(List<ActionParam> params) {
 /// Registers read-only tools for server health/status and the
 /// self-describing action catalogue (`GET /actions`), which lets a caller
 /// discover every REST-exposed action without reading the Dart source.
-void registerMetaTools(FptMcpServer server, FptClient client) {
+void registerMetaTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_health',
+      name: 'nexsoft_health',
       description:
-          'Liveness probe for the fpt_server REST API. No auth required.',
+          'Liveness probe for the nexsoft_server REST API. No auth required.',
       inputSchema: Schema.object(),
     ),
     (request) async {
@@ -42,7 +42,7 @@ void registerMetaTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_status',
+      name: 'nexsoft_status',
       description:
           'Queue state and environment: Dart version, uptime, running and queued jobs.',
       inputSchema: Schema.object(),
@@ -65,10 +65,10 @@ void registerMetaTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_list_actions',
+      name: 'nexsoft_list_actions',
       description:
           'Catalogue of every REST-exposed action with its permission and '
-          "kind (query/mutation/job). Use fpt_describe_action for a specific "
+          "kind (query/mutation/job). Use nexsoft_describe_action for a specific "
           "action's full parameter schema.",
       inputSchema: Schema.object(),
     ),
@@ -92,7 +92,7 @@ void registerMetaTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_describe_action',
+      name: 'nexsoft_describe_action',
       description:
           "Full parameter schema for one action, by name (e.g. 'ci.build').",
       inputSchema: Schema.object(

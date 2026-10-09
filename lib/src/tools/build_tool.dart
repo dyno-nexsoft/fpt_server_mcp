@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 // Sourced from the shared enums themselves rather than hand-copied lists —
@@ -16,12 +16,12 @@ final _repos = [for (final r in GitRepo.values) r.slug];
 
 /// Friendly wrappers around the `ci.*` action group's REST aliases
 /// (`POST /builds`, `/gen`, `/replace`, `/cleans`). Purely convenience —
-/// `fpt_invoke_action` reaches the same endpoints; these tools just give
+/// `nexsoft_invoke_action` reaches the same endpoints; these tools just give
 /// them discoverable names and typed params for the common case.
-void registerBuildTools(FptMcpServer server, FptClient client) {
+void registerBuildTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_ci_build',
+      name: 'nexsoft_ci_build',
       description:
           'Trigger a CI build job (POST /builds, alias for the ci.build '
           'action). Returns immediately with a queued/running job.',
@@ -69,7 +69,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ci_gen',
+      name: 'nexsoft_ci_gen',
       description:
           'Generate proto and API docs for socialfi (POST /gen, alias for '
           'ci.gen). Returns a queued/running job.',
@@ -96,7 +96,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ci_reposts',
+      name: 'nexsoft_ci_reposts',
       description:
           'Repost TikTok, YouTube, Facebook or Instagram videos to TBChat SocialFi (POST /reposts, alias for '
           'ci.reposts). Returns a queued/running job.',
@@ -127,7 +127,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ci_replace',
+      name: 'nexsoft_ci_replace',
       description: 'Replace the SDK inside tbchat (POST /replace, alias for '
           'ci.replace). Returns a queued/running job.',
       inputSchema: Schema.object(
@@ -148,7 +148,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_ci_clean',
+      name: 'nexsoft_ci_clean',
       description:
           'Clean build artifacts and dependencies (POST /cleans, alias for '
           'ci.clean). Runs `git clean` under the hood — recoverable, but '
@@ -172,7 +172,7 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_autocomplete_branches',
+      name: 'nexsoft_autocomplete_branches',
       description: 'Get a list of remote Git branches for autocomplete (GET '
           '/autocomplete/branches). Helpful for selecting correct branch '
           'names when triggering builds.',

@@ -1,6 +1,6 @@
-# fpt_server MCP Server
+# nexsoft_server MCP Server
 
-A Model Context Protocol (MCP) server for the `fpt_server` CI/build REST API.
+A Model Context Protocol (MCP) server for the `nexsoft_server` CI/build REST API.
 Lets an AI assistant trigger builds, watch job state, and drive the build
 queue directly from chat.
 
@@ -12,55 +12,55 @@ that implementation.
 
 | Tool                          | Description                                                |
 | ------------------------------ | ----------------------------------------------------------- |
-| `fpt_health`                  | Liveness probe (no auth)                                   |
-| `fpt_status`                  | Queue state, uptime, running/queued jobs                   |
-| `fpt_list_actions`            | Catalogue of every REST-exposed action                     |
-| `fpt_describe_action`         | Full parameter schema for one action                        |
-| `fpt_list_jobs`               | List jobs, newest first, filterable by state                |
-| `fpt_get_job`                 | Full detail of one job                                      |
-| `fpt_get_job_log`             | Poll a job's build log by byte offset                        |
-| `fpt_cancel_job`              | Cancel a job                                                 |
-| `fpt_promote_job`             | Promote a queued job into the parallel lane                 |
-| `fpt_retry_job`               | Re-invoke the action recorded on a finished job              |
-| `fpt_ci_build`                | Friendly alias for the `ci.build` action                     |
-| `fpt_ci_gen`                  | Friendly alias for the `ci.gen` action                       |
-| `fpt_ci_replace`              | Friendly alias for the `ci.replace` action                   |
-| `fpt_ci_clean`                | Friendly alias for the `ci.clean` action (`invokeDangerous`) |
-| `fpt_zentao_report_start`     | Start today's Zentao daily report task                       |
-| `fpt_zentao_report_finish`    | Finish a Zentao daily report task                            |
-| `fpt_zentao_report_close`     | Close a Zentao daily report task                             |
-| `fpt_zentao_report_edit`      | Edit a Zentao daily report task                              |
-| `fpt_zentao_report_get`       | View a Zentao daily report task                              |
-| `fpt_admin_apikeys_list`      | List your API keys                                           |
-| `fpt_admin_apikeys_add`       | Create a new API key                                         |
-| `fpt_admin_apikeys_remove`    | Delete an API key                                            |
-| `fpt_admin_logs_tail`         | Read the last N lines of server.log (`admin` scope)          |
-| `fpt_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
-| `fpt_hot_reload`              | Pull latest code and hot reload, no restart (`admin` scope)  |
-| `fpt_restart`                 | Pull latest code and restart the process (`admin` scope)     |
-| `fpt_schedule_get`            | Working calendar, days off and every scheduled job with its next run |
-| `fpt_schedule_set_weekday`    | Make a weekday a working day or not, and set its hours (`admin` scope) |
-| `fpt_schedule_add_exception`  | Declare a day off or a make-up working day on a date (`admin` scope) |
-| `fpt_schedule_remove_exception` | Remove a day off or make-up day (`admin` scope)            |
-| `fpt_schedule_set_job`        | Switch a job on/off, move it, or add a spoken announcement (`admin` scope) |
-| `fpt_schedule_remove_job`     | Delete a spoken announcement (`admin` scope)                 |
-| `fpt_limits_get` / `fpt_limits_set` | Show / change the admin limits: retention, timeouts, AI settings |
-| `fpt_ai_provider_get` / `fpt_ai_provider_set` | Show / select the AI provider (Gemini or Groq) and failover |
-| `fpt_invoke_action`           | Generic dispatch — reaches any action by name                |
+| `nexsoft_health`                  | Liveness probe (no auth)                                   |
+| `nexsoft_status`                  | Queue state, uptime, running/queued jobs                   |
+| `nexsoft_list_actions`            | Catalogue of every REST-exposed action                     |
+| `nexsoft_describe_action`         | Full parameter schema for one action                        |
+| `nexsoft_list_jobs`               | List jobs, newest first, filterable by state                |
+| `nexsoft_get_job`                 | Full detail of one job                                      |
+| `nexsoft_get_job_log`             | Poll a job's build log by byte offset                        |
+| `nexsoft_cancel_job`              | Cancel a job                                                 |
+| `nexsoft_promote_job`             | Promote a queued job into the parallel lane                 |
+| `nexsoft_retry_job`               | Re-invoke the action recorded on a finished job              |
+| `nexsoft_ci_build`                | Friendly alias for the `ci.build` action                     |
+| `nexsoft_ci_gen`                  | Friendly alias for the `ci.gen` action                       |
+| `nexsoft_ci_replace`              | Friendly alias for the `ci.replace` action                   |
+| `nexsoft_ci_clean`                | Friendly alias for the `ci.clean` action (`invokeDangerous`) |
+| `nexsoft_zentao_report_start`     | Start today's Zentao daily report task                       |
+| `nexsoft_zentao_report_finish`    | Finish a Zentao daily report task                            |
+| `nexsoft_zentao_report_close`     | Close a Zentao daily report task                             |
+| `nexsoft_zentao_report_edit`      | Edit a Zentao daily report task                              |
+| `nexsoft_zentao_report_get`       | View a Zentao daily report task                              |
+| `nexsoft_admin_apikeys_list`      | List your API keys                                           |
+| `nexsoft_admin_apikeys_add`       | Create a new API key                                         |
+| `nexsoft_admin_apikeys_remove`    | Delete an API key                                            |
+| `nexsoft_admin_logs_tail`         | Read the last N lines of server.log (`admin` scope)          |
+| `nexsoft_cron_run`                | Run a scheduled job immediately (`invokeDangerous`)          |
+| `nexsoft_hot_reload`              | Pull latest code and hot reload, no restart (`admin` scope)  |
+| `nexsoft_restart`                 | Pull latest code and restart the process (`admin` scope)     |
+| `nexsoft_schedule_get`            | Working calendar, days off and every scheduled job with its next run |
+| `nexsoft_schedule_set_weekday`    | Make a weekday a working day or not, and set its hours (`admin` scope) |
+| `nexsoft_schedule_add_exception`  | Declare a day off or a make-up working day on a date (`admin` scope) |
+| `nexsoft_schedule_remove_exception` | Remove a day off or make-up day (`admin` scope)            |
+| `nexsoft_schedule_set_job`        | Switch a job on/off, move it, or add a spoken announcement (`admin` scope) |
+| `nexsoft_schedule_remove_job`     | Delete a spoken announcement (`admin` scope)                 |
+| `nexsoft_limits_get` / `nexsoft_limits_set` | Show / change the admin limits: retention, timeouts, AI settings |
+| `nexsoft_ai_provider_get` / `nexsoft_ai_provider_set` | Show / select the AI provider (Gemini or Groq) and failover |
+| `nexsoft_invoke_action`           | Generic dispatch — reaches any action by name                |
 
 **Design notes:**
 - No login step: auth is a static API key sent as `X-API-Key` on every request.
 - GET responses are cached only for `/actions` (rarely changes, 5 min TTL);
   job/status endpoints always hit the network so state stays current.
 - No SSE tool: an MCP tool call is request/response, not a long-lived stream.
-  Real-time log tailing is exposed instead as `fpt_get_job_log`'s
+  Real-time log tailing is exposed instead as `nexsoft_get_job_log`'s
   offset-based polling — call it again with the returned `nextOffset`.
-- `fpt_server` is LAN-only, not published to the public internet. This MCP
+- `nexsoft_server` is LAN-only, not published to the public internet. This MCP
   server must run somewhere that can reach it directly — e.g. on the same
-  host, pointing `FPT_SERVER_BASE_URL` at `http://localhost:8080/api/v1` —
+  host, pointing `NEXSOFT_SERVER_BASE_URL` at `http://localhost:8080/api/v1` —
   or over a VPN/LAN connection to it.
 - Wire types (`Job`, `Health`, `SystemStatus`, `ActionSchema`, ...) come from
-  [`fpt_server_shared`](https://github.com/dyno-nexsoft/fpt_server_shared),
+  [`nexsoft_server_shared`](https://github.com/dyno-nexsoft/nexsoft_server_shared),
   the same package the backend and dashboard use — this is a third consumer
   of it, not a fourth hand-copied set of models.
 
@@ -70,27 +70,27 @@ Set these as real OS environment variables (not `--dart-define`) — via a
 `.env` you source before running, or the MCP client's own `env` block:
 
 ```env
-FPT_SERVER_BASE_URL=https://<fpt-server-host>/api/v1
-FPT_SERVER_API_KEY=<secret>
+NEXSOFT_SERVER_BASE_URL=https://<nexsoft-server-host>/api/v1
+NEXSOFT_SERVER_API_KEY=<secret>
 ```
 
 ## MCP Client Integration
 
 This server communicates via stdio transport. Requires a local checkout with
-`fpt_server_shared` available as a sibling directory (`../fpt_server_shared`)
+`nexsoft_server_shared` available as a sibling directory (`../nexsoft_server_shared`)
 — the normal case when this repo is checked out as a submodule of the parent
-`fpt_server` repo, since that's where both this repo and `fpt_server_shared`
+`nexsoft_server` repo, since that's where both this repo and `nexsoft_server_shared`
 already live side by side.
 
 ```json
 {
   "mcpServers": {
-    "fpt_server": {
+    "nexsoft_server": {
       "command": "dart",
-      "args": ["run", "/path/to/fpt_server/fpt_server_mcp/bin/fpt_server_mcp.dart"],
+      "args": ["run", "/path/to/nexsoft_server/nexsoft_server_mcp/bin/nexsoft_server_mcp.dart"],
       "env": {
-        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
-        "FPT_SERVER_API_KEY": "<secret>"
+        "NEXSOFT_SERVER_BASE_URL": "https://<nexsoft-server-host>/api/v1",
+        "NEXSOFT_SERVER_API_KEY": "<secret>"
       }
     }
   }
@@ -98,17 +98,17 @@ already live side by side.
 ```
 
 Or point at a compiled executable (built via `dart compile exe
-bin/fpt_server_mcp.dart -o fpt_server_mcp`, or downloaded from a
+bin/nexsoft_server_mcp.dart -o nexsoft_server_mcp`, or downloaded from a
 [release](../../releases)) instead of `dart run`, for faster startup:
 
 ```json
 {
   "mcpServers": {
-    "fpt_server": {
-      "command": "/path/to/fpt_server_mcp",
+    "nexsoft_server": {
+      "command": "/path/to/nexsoft_server_mcp",
       "env": {
-        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
-        "FPT_SERVER_API_KEY": "<secret>"
+        "NEXSOFT_SERVER_BASE_URL": "https://<nexsoft-server-host>/api/v1",
+        "NEXSOFT_SERVER_API_KEY": "<secret>"
       }
     }
   }
@@ -125,16 +125,16 @@ and the env block is called `environment`, not `env`:
 ```jsonc
 {
   "mcp": {
-    "fpt_server": {
+    "nexsoft_server": {
       "type": "local",
       "command": [
         "dart",
         "run",
-        "/path/to/fpt_server/fpt_server_mcp/bin/fpt_server_mcp.dart"
+        "/path/to/nexsoft_server/nexsoft_server_mcp/bin/nexsoft_server_mcp.dart"
       ],
       "environment": {
-        "FPT_SERVER_BASE_URL": "https://<fpt-server-host>/api/v1",
-        "FPT_SERVER_API_KEY": "<secret>"
+        "NEXSOFT_SERVER_BASE_URL": "https://<nexsoft-server-host>/api/v1",
+        "NEXSOFT_SERVER_API_KEY": "<secret>"
       }
     }
   }
@@ -147,26 +147,26 @@ and the env block is called `environment`, not `env`:
 dart pub get
 dart analyze
 dart test
-dart run bin/fpt_server_mcp.dart   # runs the server directly against stdio
+dart run bin/nexsoft_server_mcp.dart   # runs the server directly against stdio
 ```
 
 ### Project structure
 
 ```
 bin/
-└── fpt_server_mcp.dart      # Entry point — connects the server to stdio
+└── nexsoft_server_mcp.dart      # Entry point — connects the server to stdio
 
 lib/src/
-├── server.dart               # FptMcpServer: registers every tool group
-├── fpt_client.dart           # http client: API key header, selective GET cache
+├── server.dart               # NexsoftMcpServer: registers every tool group
+├── nexsoft_client.dart           # http client: API key header, selective GET cache
 ├── job_formatter.dart        # jobToMarkdown · jobsToMarkdown
 ├── mcp_response.dart         # mcpText
 └── tools/
-    ├── meta_tool.dart         # fpt_health · fpt_status · fpt_list_actions · fpt_describe_action
-    ├── job_tool.dart          # fpt_list_jobs · fpt_get_job · fpt_get_job_log · fpt_cancel_job · fpt_promote_job · fpt_retry_job
-    ├── build_tool.dart        # fpt_ci_build · fpt_ci_gen · fpt_ci_replace · fpt_ci_clean
-    ├── zentao_tool.dart       # fpt_zentao_report_*
-    ├── admin_tool.dart        # fpt_admin_apikeys_* · fpt_admin_logs_tail · fpt_cron_run · fpt_hot_reload · fpt_restart
-    ├── config_tool.dart       # fpt_schedule_* · fpt_limits_* (read-modify-write over schedule.* and limits.*)
-    └── action_tool.dart       # fpt_invoke_action
+    ├── meta_tool.dart         # nexsoft_health · nexsoft_status · nexsoft_list_actions · nexsoft_describe_action
+    ├── job_tool.dart          # nexsoft_list_jobs · nexsoft_get_job · nexsoft_get_job_log · nexsoft_cancel_job · nexsoft_promote_job · nexsoft_retry_job
+    ├── build_tool.dart        # nexsoft_ci_build · nexsoft_ci_gen · nexsoft_ci_replace · nexsoft_ci_clean
+    ├── zentao_tool.dart       # nexsoft_zentao_report_*
+    ├── admin_tool.dart        # nexsoft_admin_apikeys_* · nexsoft_admin_logs_tail · nexsoft_cron_run · nexsoft_hot_reload · nexsoft_restart
+    ├── config_tool.dart       # nexsoft_schedule_* · nexsoft_limits_* (read-modify-write over schedule.* and limits.*)
+    └── action_tool.dart       # nexsoft_invoke_action
 ```

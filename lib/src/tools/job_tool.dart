@@ -1,9 +1,9 @@
 import 'package:dart_mcp/server.dart';
-import 'package:fpt_server_shared/fpt_server_shared.dart';
+import 'package:nexsoft_server_shared/nexsoft_server_shared.dart';
 
-import '../fpt_client.dart';
 import '../job_formatter.dart';
 import '../mcp_response.dart';
+import '../nexsoft_client.dart';
 import '../server.dart';
 
 /// Wire values a caller may filter by — every [JobState] except [JobState.unknown],
@@ -18,12 +18,12 @@ final _jobStates = [
 ///
 /// There is intentionally no SSE-streaming tool here — an MCP tool call is
 /// request/response, not a long-lived connection, so real-time log tailing
-/// is exposed instead as `fpt_get_job_log`'s offset-based polling
+/// is exposed instead as `nexsoft_get_job_log`'s offset-based polling
 /// (`?offset=` in, `X-Log-Next-Offset` out), which a caller can loop on.
-void registerJobTools(FptMcpServer server, FptClient client) {
+void registerJobTools(NexsoftMcpServer server, NexsoftClient client) {
   server.registerTool(
     Tool(
-      name: 'fpt_list_jobs',
+      name: 'nexsoft_list_jobs',
       description:
           'List jobs, newest first. Optionally filter by state and cap the count.',
       inputSchema: Schema.object(
@@ -55,7 +55,7 @@ void registerJobTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_get_job',
+      name: 'nexsoft_get_job',
       description: 'Get full detail of one job by id.',
       inputSchema: Schema.object(
         properties: {
@@ -75,7 +75,7 @@ void registerJobTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_get_job_log',
+      name: 'nexsoft_get_job_log',
       description:
           "Fetch a slice of a job's build log starting at `offset` (polling "
           'alternative to SSE). Call again with the returned `nextOffset` to '
@@ -104,7 +104,7 @@ void registerJobTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_cancel_job',
+      name: 'nexsoft_cancel_job',
       description: 'Cancel a job. Fails with 409 if it already finished.',
       inputSchema: Schema.object(
         properties: {'id': Schema.string(description: 'Job id')},
@@ -122,7 +122,7 @@ void registerJobTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_promote_job',
+      name: 'nexsoft_promote_job',
       description:
           'Promote a queued job into the parallel lane (fresh workspace '
           "clone). Fails with 409 for scripts that ignore `--now`.",
@@ -142,7 +142,7 @@ void registerJobTools(FptMcpServer server, FptClient client) {
 
   server.registerTool(
     Tool(
-      name: 'fpt_retry_job',
+      name: 'nexsoft_retry_job',
       description:
           'Re-invoke the action recorded on a finished job as a new job.',
       inputSchema: Schema.object(
