@@ -44,6 +44,17 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
             description: 'Build environment (default: dev)',
           ),
           'release_notes': Schema.string(description: 'Release notes'),
+          'build_name': Schema.string(
+            description: "Build name, e.g. 1.4.2 (default: today's date)",
+          ),
+          'build_number': Schema.int(
+            minimum: 1,
+            description: 'Build number, e.g. 42 (default: time of day)',
+          ),
+          'skip_firebase_distribution': Schema.bool(
+            description: 'Skip uploading the build to Firebase App '
+                'Distribution (default: false)',
+          ),
         },
         required: ['tbchat', 'database'],
       ),

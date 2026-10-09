@@ -100,6 +100,11 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
                 'there. The reply is also capped at about 12k characters, '
                 'dropping the oldest lines first.',
           ),
+          'source': UntitledSingleSelectEnumSchema(
+            values: ['server', 'novnc'],
+            description: 'Which log to read: `server` (the bot, default) or '
+                '`novnc` (the remote-desktop service)',
+          ),
           'from_line': Schema.int(
             minimum: 1,
             description: 'First line to return, by the absolute 1-based '
@@ -135,6 +140,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         // one there is no reason to fetch more than is shown. A range is
         // read as asked either way.
         lines: filtering && !ranged ? _filterScanLines : lines,
+        source: args['source'] as String?,
         fromLine: from,
         toLine: to,
       );

@@ -253,6 +253,43 @@ void main() {
     });
   });
 
+  test('ci build forwards every ci.build param, new ones included', () async {
+    final h = await _start(
+      (_) => (
+        200,
+        {
+          'id': 'j-1',
+          'command': 'build.sh',
+          'state': 'queued',
+          'action_name': 'ci.build',
+          'created_at': '2026-01-02T03:04:05.000Z',
+        },
+      ),
+    );
+    await h.call('fpt_ci_build', {
+      'tbchat': 'dev',
+      'database': 'dev',
+      'build_name': '1.4.2',
+      'build_number': 42,
+      'skip_firebase_distribution': true,
+    });
+
+    expect(h.sent.single.path, '/builds');
+    expect(h.sent.single.body, containsPair('build_name', '1.4.2'));
+    expect(h.sent.single.body, containsPair('build_number', 42));
+    expect(
+      h.sent.single.body,
+      containsPair('skip_firebase_distribution', true),
+    );
+  });
+
+  test('logs tail passes the log source through', () async {
+    final h = await _start((_) => (200, {'lines': <String>[]}));
+    await h.call('fpt_admin_logs_tail', {'source': 'novnc'});
+
+    expect(h.sent.single.body['source'], 'novnc');
+  });
+
   test('a server error comes back as an error result, not a crash', () async {
     final h = await _start(
       (_) => (
