@@ -101,5 +101,40 @@ void main() {
       await client.getJson('/health');
       expect(seenHeader, 'secret-key');
     });
+
+    test('invokeAction posts the params to /actions/<name>', () async {
+      late http.Request sent;
+      final client = FptClient(
+        baseUrl: 'https://example.test',
+        apiKey: '',
+        client: MockClient((request) async {
+          sent = request;
+          return http.Response(jsonEncode({'message': 'ok'}), 200);
+        }),
+      );
+
+      final result = await client.invokeAction('cron.run', {'job': 'x'});
+
+      expect(sent.method, 'POST');
+      expect(sent.url.path, '/actions/cron.run');
+      expect(jsonDecode(sent.body), {'job': 'x'});
+      expect(result, {'message': 'ok'});
+    });
+
+    test('invokeAction encodes a name that is not path-safe', () async {
+      late Uri sent;
+      final client = FptClient(
+        baseUrl: 'https://example.test',
+        apiKey: '',
+        client: MockClient((request) async {
+          sent = request.url;
+          return http.Response('', 200);
+        }),
+      );
+
+      await client.invokeAction('a/b', const {});
+
+      expect(sent.path, '/actions/a%2Fb');
+    });
   });
 }
