@@ -31,8 +31,7 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       inputSchema: Schema.object(),
     ),
     (request) async {
-      final result = await client.postJson('/actions/admin.apiKeys.list');
-      return mcpText(apiKeysToMarkdown(result));
+      return mcpText(apiKeysToMarkdown(await client.apiKeysList()));
     },
   );
 
@@ -52,10 +51,12 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/admin.apiKeys.add',
-        request.arguments ?? const {},
-      );
+      final params =
+          ApiKeyAddParams(name: request.arguments!['name'] as String);
+      // Raw, not `client.apiKeysAdd`: the reply's name and scopes are worth
+      // showing and the typed result keeps neither.
+      final result =
+          await client.invokeAction('admin.apiKeys.add', params.toJson());
       return mcpText(apiKeyCreatedToMarkdown(result));
     },
   );
@@ -73,11 +74,10 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/admin.apiKeys.remove',
-        request.arguments ?? const {},
+      final result = await client.apiKeysRemove(
+        ApiKeyRemoveParams(id: request.arguments!['id'] as String),
       );
-      return mcpText(resultToMarkdown(result));
+      return mcpText(result.message);
     },
   );
 
@@ -138,10 +138,10 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
         fromLine: from,
         toLine: to,
       );
-      final result = await client.postJson(
-        '/actions/admin.logs.tail',
-        params.toJson(),
-      );
+      // Raw, not `client.logsTail`: the formatter tells a reply without
+      // line numbers apart from one that starts at line 1.
+      final result =
+          await client.invokeAction('admin.logs.tail', params.toJson());
       return mcpText(
         logLinesToMarkdown(
           result,
@@ -171,11 +171,10 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/cron.run',
-        request.arguments ?? const {},
+      final result = await client.cronRun(
+        CronRunParams(job: request.arguments!['job'] as String),
       );
-      return mcpText(resultToMarkdown(result));
+      return mcpText(result.message);
     },
   );
 
@@ -187,8 +186,8 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       inputSchema: Schema.object(),
     ),
     (request) async {
-      final result = await client.postJson('/actions/system.hotReload');
-      return mcpText(resultToMarkdown(result));
+      final result = await client.hotReload();
+      return mcpText(result.message);
     },
   );
 
@@ -214,11 +213,8 @@ void registerAdminTools(FptMcpServer server, FptClient client) {
       final params = RestartParams(
         whenIdle: request.arguments?['when_idle'] as bool? ?? false,
       );
-      final result = await client.postJson(
-        '/actions/system.restart',
-        params.toJson(),
-      );
-      return mcpText(resultToMarkdown(result));
+      final result = await client.restart(params);
+      return mcpText(result.message);
     },
   );
 }

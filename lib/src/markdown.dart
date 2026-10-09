@@ -49,16 +49,11 @@ String resultToMarkdown(Map<String, dynamic> json) {
 
 /// `admin.apiKeys.list` as a table — one row per key, the hash left out (64
 /// characters nobody reads) and the key this call was made with marked.
-String apiKeysToMarkdown(Map<String, dynamic> json) {
-  final keys = [
-    for (final key in json['keys'] as List<dynamic>? ?? const [])
-      ApiKeyInfo.fromJson(key as Map<String, dynamic>),
-  ];
-  if (keys.isEmpty) return '_No API keys._';
-  final current = json['current_key_id'];
+String apiKeysToMarkdown(ApiKeyList list) {
+  if (list.keys.isEmpty) return '_No API keys._';
   final rows = [
-    for (final key in keys)
-      '| ${_cell(key.name)}${key.id == current ? ' _(this key)_' : ''} '
+    for (final key in list.keys)
+      '| ${_cell(key.name)}${key.id == list.currentKeyId ? ' _(this key)_' : ''} '
           '| `${key.id}` '
           '| ${_cell(key.scopes.join(', '))} '
           '| ${_cell(key.discord?.label ?? key.discordUserId ?? '—')} '

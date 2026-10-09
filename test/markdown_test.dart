@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:fpt_server_mcp/src/fpt_client.dart';
 import 'package:fpt_server_mcp/src/markdown.dart';
+import 'package:fpt_server_shared/fpt_server_shared.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -64,7 +65,7 @@ void main() {
 
   group('apiKeysToMarkdown', () {
     test('one row per key, the current one marked, no hash', () {
-      final out = apiKeysToMarkdown({
+      final out = apiKeysToMarkdown(ApiKeyList.fromJson({
         'current_key_id': 'k1',
         'keys': [
           {
@@ -82,7 +83,7 @@ void main() {
             'scopes': ['read', 'invoke'],
           },
         ],
-      });
+      }));
       expect(
           out, contains('| Me _(this key)_ | `k1` | admin | dyno | never |'));
       expect(out, contains('| Bot | `k2` | read, invoke | — | never |'));
@@ -90,7 +91,7 @@ void main() {
     });
 
     test('no keys', () {
-      expect(apiKeysToMarkdown({'keys': []}), '_No API keys._');
+      expect(apiKeysToMarkdown(const ApiKeyList(keys: [])), '_No API keys._');
     });
   });
 

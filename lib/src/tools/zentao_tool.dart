@@ -1,4 +1,5 @@
 import 'package:dart_mcp/server.dart';
+import 'package:fpt_server_shared/fpt_server_shared.dart';
 
 import '../fpt_client.dart';
 import '../markdown.dart';
@@ -24,11 +25,10 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/zentao.report.start',
-        request.arguments ?? const {},
+      final started = await client.zentaoReportStart(
+        ZentaoReportStartParams(description: _description(request)),
       );
-      return mcpText(resultToMarkdown(result));
+      return mcpText('${started.message}\n\n- **task_id**: ${started.taskId}');
     },
   );
 
@@ -43,11 +43,9 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/zentao.report.finish',
-        request.arguments ?? const {},
-      );
-      return mcpText(resultToMarkdown(result));
+      final result = await client
+          .zentaoReportFinish(ZentaoTaskParams(taskId: _taskId(request)));
+      return mcpText(result.message);
     },
   );
 
@@ -61,11 +59,9 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/zentao.report.close',
-        request.arguments ?? const {},
-      );
-      return mcpText(resultToMarkdown(result));
+      final result = await client
+          .zentaoReportClose(ZentaoTaskParams(taskId: _taskId(request)));
+      return mcpText(result.message);
     },
   );
 
@@ -83,11 +79,13 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/zentao.report.edit',
-        request.arguments ?? const {},
+      final result = await client.zentaoReportEdit(
+        ZentaoReportEditParams(
+          taskId: _taskId(request),
+          description: _description(request),
+        ),
       );
-      return mcpText(resultToMarkdown(result));
+      return mcpText(result.message);
     },
   );
 
@@ -102,11 +100,15 @@ void registerZentaoTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final result = await client.postJson(
-        '/actions/zentao.report.get',
-        request.arguments ?? const {},
-      );
-      return mcpText(resultToMarkdown(result));
+      final task = await client
+          .zentaoReportGet(ZentaoTaskParams(taskId: _taskId(request)));
+      return mcpText(resultToMarkdown(task.toJson()));
     },
   );
 }
+
+int _taskId(CallToolRequest request) =>
+    (request.arguments!['task_id'] as num).toInt();
+
+String _description(CallToolRequest request) =>
+    request.arguments?['description'] as String? ?? '';

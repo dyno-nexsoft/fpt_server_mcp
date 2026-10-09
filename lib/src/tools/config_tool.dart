@@ -6,20 +6,6 @@ import '../fpt_client.dart';
 import '../mcp_response.dart';
 import '../server.dart';
 
-/// Lets the typed `FptActions` calls run over the MCP client's plain POST.
-class _Transport implements ActionTransport {
-  const _Transport(this._client);
-
-  final FptClient _client;
-
-  @override
-  Future<Map<String, dynamic>> invokeAction(
-    String name,
-    Map<String, Object?> params,
-  ) =>
-      _client.postJson('/actions/$name', params);
-}
-
 String? _string(Map<String, Object?>? args, String key) {
   final value = args?[key];
   return value is String && value.trim().isNotEmpty ? value.trim() : null;
@@ -84,14 +70,12 @@ String scheduleToMarkdown(ScheduleInfo info) {
 /// back, so a caller says "make 2 Jan a day off" rather than assembling the
 /// whole calendar `schedule.set` takes. The server still validates everything.
 void registerConfigTools(FptMcpServer server, FptClient client) {
-  final api = _Transport(client);
-
   Future<CallToolResult> saveSchedule(
     ScheduleInfo current, {
     WorkCalendar? calendar,
     List<ScheduledJobConfig>? jobs,
   }) async {
-    final saved = await api.scheduleSet(
+    final saved = await client.scheduleSet(
       ScheduleSetParams(
         calendar: calendar ?? current.calendar,
         jobs: jobs ?? [for (final job in current.jobs) job.config],
@@ -111,7 +95,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
           'with its rule and next run (schedule.get).',
       inputSchema: Schema.object(),
     ),
-    (request) async => mcpText(scheduleToMarkdown(await api.scheduleGet())),
+    (request) async => mcpText(scheduleToMarkdown(await client.scheduleGet())),
   );
 
   server.registerTool(
@@ -138,7 +122,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final args = request.arguments;
-      final current = await api.scheduleGet();
+      final current = await client.scheduleGet();
       return saveSchedule(
         current,
         calendar: edit.editWeekday(
@@ -182,7 +166,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final args = request.arguments;
-      final current = await api.scheduleGet();
+      final current = await client.scheduleGet();
       return saveSchedule(
         current,
         calendar: edit.addException(
@@ -209,7 +193,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final current = await api.scheduleGet();
+      final current = await client.scheduleGet();
       return saveSchedule(
         current,
         calendar: edit.removeException(
@@ -258,7 +242,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
     ),
     (request) async {
       final args = request.arguments;
-      final current = await api.scheduleGet();
+      final current = await client.scheduleGet();
       final anchor = _string(args, 'anchor');
       return saveSchedule(
         current,
@@ -288,7 +272,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
       ),
     ),
     (request) async {
-      final current = await api.scheduleGet();
+      final current = await client.scheduleGet();
       return saveSchedule(
         current,
         jobs: edit.removeJob(
@@ -322,7 +306,7 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
       inputSchema: Schema.object(),
     ),
     (request) async =>
-        mcpText(limitsToMarkdown((await api.limitsGet()).limits)),
+        mcpText(limitsToMarkdown((await client.limitsGet()).limits)),
   );
 
   server.registerTool(
@@ -352,10 +336,10 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
         throw FptRequestError(
             400, 'config.invalid_edit', 'Name at least one limit.');
       }
-      final saved = await api.limitsSet(
+      final saved = await client.limitsSet(
         LimitsSetParams(
           limits: AppLimits.fromJson({
-            ...(await api.limitsGet()).limits.toJson(),
+            ...(await client.limitsGet()).limits.toJson(),
             ...named,
           }),
         ),
@@ -383,7 +367,8 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
           'over when the active one is down (admin.aiProvider.get).',
       inputSchema: Schema.object(),
     ),
-    (request) async => mcpText(providerToMarkdown(await api.aiProviderGet())),
+    (request) async =>
+        mcpText(providerToMarkdown(await client.aiProviderGet())),
   );
 
   server.registerTool(
@@ -428,8 +413,8 @@ void registerConfigTools(FptMcpServer server, FptClient client) {
       }
       // The server takes the provider on every call; keep the current one when
       // only failover is being changed.
-      final current = provider ?? (await api.aiProviderGet()).provider;
-      final saved = await api.aiProviderSet(
+      final current = provider ?? (await client.aiProviderGet()).provider;
+      final saved = await client.aiProviderSet(
         AiProviderSetParams(
           provider: current,
           failover: failover,

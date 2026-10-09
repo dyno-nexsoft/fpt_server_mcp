@@ -91,7 +91,9 @@ void registerBuildTools(FptMcpServer server, FptClient client) {
           'ci.reposts). Returns a queued/running job.',
       inputSchema: Schema.object(
         properties: {
-          'url': Schema.string(description: 'TikTok, YouTube, Facebook or Instagram video or profile link'),
+          'url': Schema.string(
+              description:
+                  'TikTok, YouTube, Facebook or Instagram video or profile link'),
           'environment': UntitledSingleSelectEnumSchema(
             values: _buildEnvironments,
             description: 'Environment (default: dev)',

@@ -3,3 +3,5 @@ linter:
   rules:
     - prefer_relative_imports
     - directives_ordering
+    - omit_local_variable_types
+    - omit_obvious_property_types

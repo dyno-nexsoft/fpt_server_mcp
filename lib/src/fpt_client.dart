@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:fpt_server_shared/fpt_server_shared.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
@@ -34,7 +35,10 @@ class HttpResult {
 /// cached only for the `/actions` catalogue (rarely changes); job/status
 /// endpoints are always fetched fresh since callers rely on them for
 /// near-real-time state.
-class FptClient {
+///
+/// It is also the [ActionTransport] the typed `FptActions` calls run over, so
+/// a tool never spells an action name or a parameter key itself.
+class FptClient implements ActionTransport {
   factory FptClient({http.Client? client, String? baseUrl, String? apiKey}) {
     final resolvedBaseUrl =
         baseUrl ?? Platform.environment['FPT_SERVER_BASE_URL'] ?? '';
@@ -131,11 +135,18 @@ class FptClient {
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
+  @override
+  Future<Map<String, dynamic>> invokeAction(
+    String name,
+    Map<String, Object?> params,
+  ) =>
+      postJson('/actions/${Uri.encodeComponent(name)}', params);
+
   void _throwIfError(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) return;
 
-    String code = 'request_failed';
-    String message = 'Request failed with status code ${response.statusCode}';
+    var code = 'request_failed';
+    var message = 'Request failed with status code ${response.statusCode}';
     try {
       final decoded = jsonDecode(response.body);
       final error = decoded is Map ? decoded['error'] : null;
