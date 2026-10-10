@@ -33,8 +33,8 @@ void registerMetaTools(NexsoftMcpServer server, NexsoftClient client) {
       return mcpText(
         '- **ok**: ${health.ok}\n'
         '- **version**: ${health.version}\n'
-        '- **appVersion**: ${health.appVersion}\n'
-        '- **uptimeSeconds**: ${health.uptimeSeconds}\n'
+        '- **app_version**: ${health.appVersion}\n'
+        '- **uptime_seconds**: ${health.uptimeSeconds}\n'
         '- **hostname**: ${health.hostname}',
       );
     },
